@@ -1,0 +1,19 @@
+import cv2
+import numpy as np
+
+
+image = np.zeroes((800, 600, 3), np.uint8)
+
+cv2.imshow('image',image)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+
+
+
+
+"""
+class buttonGrid:
+    def __init__(self, width, height):
+        image = np.zeroes((height, width, 3), np.uint8)
+"""
