@@ -4,11 +4,14 @@ import pygame
 import time
 
 class ButtonGridManager:
+
     def __init__(self, grid_size):
+
+
         self._grid_size = grid_size
         self._grids = dict()
 
-    """def new_grid(self, grid_name, grid_size, grid_columns, grid_rows, background_color = (0,0,0)):
+    def new_grid(self, grid_name, grid_size, grid_columns, grid_rows, background_color = (0,0,0)):
         grid_name = ButtonGrid(grid_name, grid_columns, grid_rows, background_color)
         self._grids.append(grid_name)
 
@@ -20,7 +23,7 @@ class ButtonGridManager:
 
     def on_click(self):
         .on_click()
-    """
+
 
 
 
@@ -205,6 +208,10 @@ def gui(callback):
     grid_1 = ButtonGrid((800,600), 4, 2)
 
     grid_1.add(Button(callback, "panda"), 2, 1)
+    grid_1.add(Button(callback, "pumba"), 0,0)
+    grid_1.add(Button(callback, "pumba"), 0,1)
+    grid_1.add(Button(callback, "pumba"), 1,0)
+    grid_1.add(Button(callback, "pumba"), 1,1)
 
     cv2.setMouseCallback('grid', grid_1.btn_pressed, param=None)
 
@@ -214,7 +221,7 @@ def gui(callback):
     while current_time - start_time < 10:
         current_time = time.time()
         grid_1.draw()
-        time.sleep(1)
+        time.sleep(0.01)
 
 
 #size txt_size = cv2.getTextSize(text, fontFace=CV_FONT_HERSHEY_SIMPLEX, fontscale=fontsize, thickness=thick)
