@@ -1,15 +1,26 @@
+# -*- coding: utf-8 -*-
+
 import cv2
 import numpy as np
 import time
 
+
 class GUIManager:
 
-    def __init__(self, size_in, columns_in, rows_in, background_color = (0,0,0), window_name = 'grid'):
+    def __init__(self, size, window_name = 'GUI', background_color=(0,0,0)):
         """
-        GUIManager handles a set of objects containing the following functions (among others):
+        GUIManager is a simple class for keeping track of and changing between different GUI objects such as a button grid.
+        GUIManager does this by drawing the object contained in the '_current_object' variable. This variable can be changed
+        by using the 'set_current_object' function. For example, this function can be used from within one of the objects
+        the GUIManager handles on a mouse event (pushing a button or moving the mouse).
+        GUIManager draws the current object when update is called upon.
 
-        def draw(image, position, size)
-        Draws the object at the given position and within the given size.
+        GUIManager handles a set of objects containing the following functions and public vairables (among others):
+
+        PUBLIC VARIABLE: name : Contains the specific name of the object (used to keep track of objects and the set function.
+
+        def draw(image)
+        Draws the object on the given image.
         image : The image upon wich to draw
         position : The position of the object in columns and rows (columns, rows)
         size : The size that the object has to draw on in pixels (x, y)
@@ -21,26 +32,87 @@ class GUIManager:
         x = The cursors current x position in pixels
         y = The cursors current y position in pixels
 
-        :param size_in: The size of the window to open in pixels (x, y)
-        :param columns_in: How many columns that is supposed to exist
-        :param rows_in: How many rows that is supposed to exist
+        if theese functions are not present GUIManager will not work!
+
+        :param size: The size of the window to open in pixels (x, y)
         :param background_color: The color of the background (wich color the default image on wich to write is)
         :param window_name: The name of the window
         :return: None
         """
+        self._size = size
+        self._window_name = window_name
+        self._gui_objects = []
+        self._current_object = None
+        self._background_color = background_color
+
+        cv2.startWindowThread()
+        cv2.namedWindow(self._window_name)
+        # creating a new background image of the apporpriate size to write on then setting the image color to background_color
+        self.image = np.zeros((self._size[1], self._size[0], 3), dtype=np.uint8)
+        self.image[:] = self._background_color
+        cv2.setMouseCallback(window_name, self.mouse_event, param=None)
+
+
+    def add_gui_element(self, elem):
+        """
+        Adds a new gui element containing the required functions to the GUIManager. The GUIManager will change between
+        the objects contained in the list when the 'set_current_object' function is called.
+        :param elem: The element (object) that is to me added.
+        :return:
+        """
+        self._gui_objects.append(elem)
+
+
+    def set_current_object(self, gui_object_name):
+        """
+        Sets the current object by using the required name of the object. The current object is the object that is
+        drawn on the screen. One can call this function from a object within the 'gui_objects' list to be able to change
+        the object shown on the screen (for example changing button grid when pressing a button).
+        :param gui_object_name: The name of the object as a string.
+        :return:
+        """
+        for obj in self._gui_objects:
+            if obj.name == gui_object_name:
+                self._current_object = obj
+                self.reset_image()
+
+
+    def mouse_event(self, event, x, y, flag, param):
+        """
+
+        :param event:
+        :param x:
+        :param y:
+        :param flag:
+        :param param:
+        :return:
+        """
+        self._current_object.mouse_event(event, x, y, flag, param)
+
+
+    def update(self):
+        if not self._current_object == None:
+            self._current_object.draw(self.image)
+            cv2.imshow(self._window_name, self.image)
+
+    def reset_image(self):
+        self.image[:] = self._background_color
+
+
+
+class GridManager:
+
+    def __init__(self, name, size_in, columns_in, rows_in, background_color = (0,0,0)):
+
         self._columns = columns_in
         self._rows = rows_in
         self._height = size_in[1]
         self._width = size_in[0]
         self._gui_objects = []
-        self._window_name = window_name
         self._background_color = background_color
+        self._never_drawn = True
+        self.name = name
 
-        #creating a new background image of the apporpriate size to write on
-        self.image = np.zeros((self._height, self._width, 3), dtype=np.uint8)
-        self.image[:] = background_color
-        cv2.startWindowThread()
-        cv2.namedWindow(self._window_name)
 
     def add(self, gui_object, gui_pos):
         """
@@ -65,14 +137,15 @@ class GUIManager:
             gui_obj[0].mouse_event(event, x, y, flag, param)
 
 
-    def draw(self):
+    def draw(self, image):
         """
-        Draws all gui objects in the list
+        Draws all gui objects in the list on the given image then returns the image.
         """
-        for (gui_obj, col_pos, row_pos) in self._gui_objects:
-            gui_obj.draw(self.image, ((self._width/self._columns) * col_pos, (self._height/self._rows) * row_pos), (self._width/self._columns, self._height/self._rows))
 
-        cv2.imshow(self._window_name, self.image)
+        for (gui_obj, col_pos, row_pos) in self._gui_objects:
+            gui_obj.draw(image, ((self._width/self._columns) * col_pos, (self._height/self._rows) * row_pos), (self._width/self._columns, self._height/self._rows))
+
+        return image
 
 
 
@@ -116,6 +189,8 @@ class Button:
         :param y: The y position of the cursor
         :return:None
         """
+        #resetting the filled variable
+        self._btn_filled = False
         if event == cv2.cv.CV_EVENT_LBUTTONDOWN:
             self._mouse_is_pressed = True
             if self.mouse_over((x,y)):
@@ -208,12 +283,24 @@ class Button:
             cv2.rectangle(image, self._position, (self._position[0] + self._size[0], self._position[1] + self._size[1]), background_color, thickness=-1)
 
 
-def test():
-    print('callback is real')
 
 
-def gui(callback):
-    grid_1 = GUIManager((800,600), 4, 2)
+
+def gui():
+    manager = GUIManager((800, 600))
+    flag = True
+
+    def exit():
+        flag = False
+
+    def panel_1():
+        manager.set_current_object("panel1")
+
+    def panel_2():
+        manager.set_current_object("panel2")
+
+    callback = panel_2
+    grid_1 = GridManager("panel1", (800,600), 4, 2)
 
     grid_1.add(Button(callback, "panda"), (2, 1))
     grid_1.add(Button(callback, "pumba"), (0,0))
@@ -221,21 +308,35 @@ def gui(callback):
     grid_1.add(Button(callback, "pumba"), (1,0))
     grid_1.add(Button(callback, "pumba"), (1,1))
 
-    #Setting mouse callback
-    cv2.setMouseCallback('grid', grid_1.mouse_event, param=None)
+    grid_2 = GridManager("panel2", (800,600), 4, 2)
 
-    current_time = time.time()
-    start_time = time.time()
-    while current_time - start_time < 10:
+    callback = panel_1
+
+    grid_2.add(Button(callback, "a"), (2, 1))
+    grid_2.add(Button(callback, "b"), (0,0))
+    grid_2.add(Button(callback, "c"), (0,1))
+    grid_2.add(Button(callback, "d"), (1,0))
+    grid_2.add(Button(exit, "exit"), (1,1))
+
+
+    manager.add_gui_element(grid_1)
+    manager.add_gui_element((grid_2))
+
+    manager.set_current_object("panel1")
+
+    while True:
+        if not flag:
+            cv2.destroyAllWindows()
+            break
         current_time = time.time()
-        grid_1.draw()
+        manager.update()
         time.sleep(0.01)
 
-gui(test)
+gui()
 
 
 
-cv2.destroyAllWindows()
+
 
 
 
