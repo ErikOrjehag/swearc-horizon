@@ -50,18 +50,30 @@ def find_another_ball(frame, hueu, satu, viu, huel, satl, vil):
 
     cnt1, hierarchy = cv2.findContours(opening,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
 
-
     odia = 0
     for cnt in cnt1:
         area = cv2.contourArea(cnt)
         dia = np.sqrt(4*area/np.pi)
-        print("dia", dia)
-        print("o", odia)
-        if odia-10 < dia < odia+10:
+        leftmost = tuple(cnt[cnt[:,:,0].argmin()][0])
+        rightmost = tuple(cnt[cnt[:,:,0].argmax()][0])
+        topmost = tuple(cnt[cnt[:,:,1].argmin()][0])
+        bottommost = tuple(cnt[cnt[:,:,1].argmax()][0])
+        dxttb = topmost[0]-bottommost[0]
+        dyttb = topmost[1]-bottommost[1]
+        disttb = np.sqrt((dxttb*dxttb+dyttb*dyttb))
+        dxltr = topmost[0]-bottommost[0]
+        dyltr = topmost[1]-bottommost[1]
+        disltr = np.sqrt((dxltr*dxltr+dyltr*dyltr))
+        cv2.circle(res,leftmost,5,(255,0,255))
+        cv2.circle(res,topmost,5,(255,0,255))
+        cv2.circle(res,bottommost,5,(255,0,255))
+        cv2.circle(res,rightmost,5,(255,0,255))
+        if dia-1 <= disttb <= dia+1 and disltr-1 <= disttb <= disltr+1:
             x,y,w,h = cv2.boundingRect(cnt)
-            cv2.rectangle(median,(x,y),(x+w,y+h),[0,255,255],2)
+            cv2.rectangle(res,(x,y),(x+w,y+h),[0,255,255],2)
             #print "red :", x,y,w,h
         odia = dia
+
     cv2.drawContours(res, cnt1, -1, (0,255,0), 3)
 
 
@@ -89,7 +101,7 @@ def find_another_ball(frame, hueu, satu, viu, huel, satl, vil):
     """
 
 
-    return median
+    return res
 
 def scale(frame, factor):
     big = []
