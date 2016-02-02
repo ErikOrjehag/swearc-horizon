@@ -1,6 +1,8 @@
 
+
 import numpy as np
 import cv2
+import cv2.cv
 
 def find_ball(frame):
 
@@ -24,23 +26,70 @@ def find_ball(frame):
 
     return sample
 
+#def thresholdimg(img):
+
+
+
+
+
 
 def find_another_ball(frame, hueu, satu, viu, huel, satl, vil):
-    sample = cv2.resize(frame, (0,0), fx=0.5, fy=0.5)
-
-    hsv = cv2.cvtColor(sample, cv2.COLOR_BGR2HSV)
+    sample = cv2.resize(frame, (0,0), fx=1, fy=1)
+    median = cv2.medianBlur(sample,5)
+    hsv = cv2.cvtColor(median, cv2.COLOR_BGR2HSV)
     lower = np.array([huel,satl,vil])
     upper = np.array([hueu,satu,viu])
-    #lower = np.array([0,74,92])
-    #upper = np.array([10,255,255])
     mask = cv2.inRange(hsv, lower, upper)
-    res = cv2.bitwise_and(sample,sample, mask=mask)
+    #ret,thresh = cv2.threshold(mask,127,255,cv2.THRESH_BINARY)
+
+    kernel = np.ones((10,10),np.uint8)
+    closing = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
+    opening = cv2.morphologyEx(closing, cv2.MORPH_OPEN, kernel)
+
+    res = cv2.bitwise_and(sample,sample, mask=opening)
+
+    cnt1, hierarchy = cv2.findContours(opening,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+
+
+    odia = 0
+    for cnt in cnt1:
+        area = cv2.contourArea(cnt)
+        dia = np.sqrt(4*area/np.pi)
+        print("dia", dia)
+        print("o", odia)
+        if odia-10 < dia < odia+10:
+            x,y,w,h = cv2.boundingRect(cnt)
+            cv2.rectangle(median,(x,y),(x+w,y+h),[0,255,255],2)
+            #print "red :", x,y,w,h
+        odia = dia
+    cv2.drawContours(res, cnt1, -1, (0,255,0), 3)
+
+
+    """
     gray = cv2.cvtColor(res, cv2.COLOR_BGR2GRAY)
-    ret,thresh = cv2.threshold(gray,127,255,0)
-    contours, hierarchy = cv2.findContours(mask,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
-    cv2.drawContours(res, contours, -1, (0,255,0), 3)
-    #print (contours)
-    return res
+    circles = cv2.HoughCircles(gray,cv2.cv.CV_HOUGH_GRADIENT,1,10)
+    print circles
+    if np.all(circles):
+        circles = np.uint16(np.around(circles))
+        for i in circles[0,:]:
+            # draw the outer circle
+            cv2.circle(gray,(i[0],i[1]),i[2],(0,255,0),2)
+            # draw the center of the circle
+            cv2.circle(gray,(i[0],i[1]),2,(0,0,255),3)
+    """
+
+    """
+    mov = cv2.moments(opening)
+    dArea = mov["m00"]
+    if dArea > 1000:
+        y = mov["m01"]/dArea
+        x = mov["m10"]/dArea
+        cv2.circle(res,(int(x),int(y)), 2, (0,0,255))
+        print x
+    """
+
+
+    return median
 
 def scale(frame, factor):
     big = []
@@ -50,15 +99,15 @@ def scale(frame, factor):
             for x in range(len(frame[y])):
                 for j in range(factor):
                     big[y * factor + i].append(frame[y][x])
-    return big
+    return mask
 
 def nothing():
     pass
-cap = cv2.VideoCapture("ball_video.mp4")
+cap = cv2.VideoCapture(1)
 
 cv2.namedWindow('image')
 
-cv2.createTrackbar("Hue_Upper", 'image', 2, 255, nothing)
+cv2.createTrackbar("Hue_Upper", 'image', 15, 255, nothing)
 
 cv2.createTrackbar("Sat_Upper", 'image', 255, 255, nothing)
 
@@ -66,9 +115,9 @@ cv2.createTrackbar("Vi_Upper", 'image', 255, 255, nothing)
 
 cv2.createTrackbar("Hue_Lower", 'image', 0, 255, nothing)
 
-cv2.createTrackbar("Sat_Lower", 'image', 119, 255, nothing)
+cv2.createTrackbar("Sat_Lower", 'image', 115, 255, nothing)
 
-cv2.createTrackbar("Vi_Lower", 'image', 127, 255, nothing)
+cv2.createTrackbar("Vi_Lower", 'image', 115, 255, nothing)
 while(True):
     # Capture frame-by-frame
     ret, frame = cap.read()
@@ -85,7 +134,7 @@ while(True):
     sample = find_another_ball(frame, hueu, satu, viu, huel, satl, vil)
 
     cv2.imshow('frame1', frame)
-    cv2.imshow('frame2', np.array(sample))
+    cv2.imshow('frame2', sample)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
@@ -93,5 +142,7 @@ while(True):
 # When everything done, release the capture
 cap.release()
 cv2.destroyAllWindows()
+
+
 
 
