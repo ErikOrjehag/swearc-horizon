@@ -3,6 +3,9 @@
 import numpy as np
 import cv2
 import cv2.cv
+import sys
+import time
+
 
 def threshold_img(img):
     viu,satu,hueu,vil,satl,huel = determen_hsv()
@@ -24,7 +27,6 @@ def find_circles(cnt1, res):
     odia = 0
     for cnt in cnt1:
         count = 0
-        print "start"
         old_dis = 0
         for pnt in cnt[0:(len(cnt)/4)]:
             a = tuple(pnt[0])
@@ -67,10 +69,9 @@ def determen_hsv():
     return viu,satu,hueu,vil,satl,huel
 
 
-
 def find_red_circle(frame):
 
-    sample = cv2.resize(frame, (0,0), fx=1, fy=1)
+    sample = cv2.resize(frame, (0,0), fx=.5, fy=.5)
     img = threshold_img(sample)
     res = cv2.bitwise_and(sample, sample, mask=img)
     contours, hierarchy = cv2.findContours(img,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
@@ -82,7 +83,10 @@ def find_red_circle(frame):
 def nothing():
     pass
 
-cap = cv2.VideoCapture(1)
+if len(sys.argv) > 1 and sys.argv[1] == "--video":
+    cap = cv2.VideoCapture("ball_video.mp4")
+else:
+    cap = cv2.VideoCapture(1)
 
 cv2.namedWindow('image')
 
@@ -99,9 +103,20 @@ cv2.createTrackbar("Sat_Lower", 'image', 115, 255, nothing)
 cv2.createTrackbar("Vi_Lower", 'image', 115, 255, nothing)
 
 
-while(True):
+startTime = time.time()
+prevTime = None
+
+while True:
+
+    # FPS
+    nowTime = time.time()
+    if prevTime:
+        print("%3d fps" % (1 / (nowTime - prevTime)))
+    prevTime = nowTime
+
     # Capture frame-by-frame
     ret, frame = cap.read()
+
     """
     viu = cv2.getTrackbarPos("Vi_Upper", 'image')
     satu = cv2.getTrackbarPos("Sat_Upper", 'image')
@@ -111,10 +126,9 @@ while(True):
     huel = cv2.getTrackbarPos("Hue_Lower", 'image')
     """
 
-
     sample = find_red_circle(frame)
 
-    cv2.imshow('frame1', frame)
+    # cv2.imshow('frame1', frame)
     cv2.imshow('frame2', sample)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
