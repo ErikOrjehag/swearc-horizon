@@ -8,16 +8,27 @@ import time
 
 
 def threshold_img(img):
-    viu,satu,hueu,vil,satl,huel = determen_hsv()
-    median = cv2.medianBlur(img,5)
+    viu, satu, hueu, vil, satl, huel = determen_hsv()
+
+    # Blur to reduce junk. Must be an odd number.
+    median = cv2.medianBlur(img, 5)
+
     hsv = cv2.cvtColor(median, cv2.COLOR_BGR2HSV)
-    lower = np.array([huel,satl,vil])
-    upper = np.array([hueu,satu,viu])
+    lower = np.array([huel, satl, vil])
+    upper = np.array([hueu, satu, viu])
+
     mask = cv2.inRange(hsv, lower, upper)
-    #ret,thresh = cv2.threshold(mask,127,255,cv2.THRESH_BINARY)
-    kernel = np.ones((10,10),np.uint8)
+
+    # Kernel slides through the image. A pixel will be considered
+    # white only if all pixels under the kernel are white.
+    kernel = np.ones((10, 10), np.uint8)
+
+    # Remove black junk inside objects.
     closing = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
+
+    # Remove white junk outside objects.
     opening = cv2.morphologyEx(closing, cv2.MORPH_OPEN, kernel)
+
     return opening
 
 
@@ -70,10 +81,8 @@ def determen_hsv():
 
 
 def find_red_circle(frame):
-
-    sample = cv2.resize(frame, (0,0), fx=.5, fy=.5)
-    img = threshold_img(sample)
-    res = cv2.bitwise_and(sample, sample, mask=img)
+    img = threshold_img(frame)
+    res = cv2.bitwise_and(frame, frame, mask=img)
     contours, hierarchy = cv2.findContours(img,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
     find_circles(contours,res)
     cv2.drawContours(res, contours, -1, (0,255,0), 3)
@@ -84,11 +93,11 @@ def nothing():
     pass
 
 if len(sys.argv) > 1 and sys.argv[1] == "--video":
-    cap = cv2.VideoCapture("ball_video.mp4")
+    cap = cv2.VideoCapture("ticket.mp4")
 else:
     cap = cv2.VideoCapture(0)
 
-cv2.namedWindow('image')
+cv2.namedWindow('image', flags=cv2.WINDOW_NORMAL)
 
 cv2.createTrackbar("Hue_Upper", 'image', 15, 255, nothing)
 
@@ -106,6 +115,9 @@ cv2.createTrackbar("Vi_Lower", 'image', 115, 255, nothing)
 startTime = time.time()
 prevTime = None
 
+# Capture frame-by-frame
+ret, frame = cap.read()
+
 while True:
 
     # FPS
@@ -114,22 +126,14 @@ while True:
         print("%3d fps" % (1 / (nowTime - prevTime)))
     prevTime = nowTime
 
-    # Capture frame-by-frame
-    ret, frame = cap.read()
+    scale = 0.3
 
-    """
-    viu = cv2.getTrackbarPos("Vi_Upper", 'image')
-    satu = cv2.getTrackbarPos("Sat_Upper", 'image')
-    hueu = cv2.getTrackbarPos("Hue_Upper", 'image')
-    vil = cv2.getTrackbarPos("Vi_Lower", 'image')
-    satl = cv2.getTrackbarPos("Sat_Lower", 'image')
-    huel = cv2.getTrackbarPos("Hue_Lower", 'image')
-    """
+    small = cv2.resize(frame, (0, 0), fx=scale, fy=scale)
 
-    sample = find_red_circle(frame)
+    sample = find_red_circle(small)
 
-    # cv2.imshow('frame1', frame)
-    cv2.imshow('frame2', sample)
+    cv2.imshow('original', small)
+    cv2.imshow('result', sample)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
@@ -137,26 +141,3 @@ while True:
 # When everything done, release the capture
 cap.release()
 cv2.destroyAllWindows()
-
-
-
-"""
-gray = cv2.cvtColor(res, cv2.COLOR_BGR2GRAY)
-    circles = cv2.HoughCircles(gray,cv2.cv.CV_HOUGH_GRADIENT,1,10)
-    print circles
-    if np.all(circles):
-        circles = np.uint16(np.around(circles))
-        for i in circles[0,:]:
-            # draw the outer circle
-            cv2.circle(gray,(i[0],i[1]),i[2],(0,255,0),2)
-            # draw the center of the circle
-            cv2.circle(gray,(i[0],i[1]),2,(0,0,255),3)
-
-    mov = cv2.moments(opening)
-    dArea = mov["m00"]
-    if dArea > 1000:
-        y = mov["m01"]/dArea
-        x = mov["m10"]/dArea
-        cv2.circle(res,(int(x),int(y)), 2, (0,0,255))
-        print x
-"""
