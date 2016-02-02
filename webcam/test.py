@@ -86,7 +86,7 @@ def nothing():
 if len(sys.argv) > 1 and sys.argv[1] == "--video":
     cap = cv2.VideoCapture("ball_video.mp4")
 else:
-    cap = cv2.VideoCapture(1)
+    cap = cv2.VideoCapture(0)
 
 cv2.namedWindow('image')
 
