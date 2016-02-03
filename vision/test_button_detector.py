@@ -84,6 +84,10 @@ def main():
 
         sample = button_detector.find_button(small)
 
+        # TODO: Create a filter that looks at the sequence of
+        # TODO: button positions reduce effects of drastic change,
+        # TODO: likely caused by a mistake of the detector.
+
         cv2.imshow('original', small)
         cv2.imshow('result', sample)
 

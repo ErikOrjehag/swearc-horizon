@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import math
 
 
 class ButtonDetector():
@@ -36,27 +37,18 @@ class ButtonDetector():
         # Cut out the parts of the image that has the correct color.
         res = cv2.bitwise_and(image, image, mask=mask)
 
-        # TODO: Add comment.
-        # contours, hierarchy = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        # Find the contours of the cut out parts.
+        contours, hierarchy = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-        # TODO: Add comment.
-        # self.find_circles(contours, res)
-
-        # TODO: Add comment.
-
-        circles = self.find_circles2(res)
-
-        # Test show found circles.
-        if circles is not None:
-            circles = np.uint16(np.around(circles))
-            for i in circles[0, :]:
-                # draw the outer circle
-                cv2.circle(res, (i[0], i[1]), i[2], (0, 255, 0), 2)
-                # draw the center of the circle
-                cv2.circle(res, (i[0], i[1]), 2, (0, 255, 0), 2)
+        # Find an ellipse that matches the contour that is most
+        # probable to be the button on the ticket machine.
+        ellipse = self.best_ellipse_in_contours(contours)
 
         # Using -1 means that we want to draw all contours.
-        # cv2.drawContours(res, contours, -1, (255, 255, 255), 1)
+        cv2.drawContours(res, contours, -1, (255, 255, 255), 1)
+
+        if ellipse:
+            cv2.ellipse(res, ellipse, (0, 255, 0), 3)
 
         return res
 
@@ -92,15 +84,47 @@ class ButtonDetector():
 
         return mask
 
-    def find_circles2(self, image):
+    def best_ellipse_in_contours(self, contours):
         """
-        TODO: Add docstring.
-        :param image:
-        :return:
+        Finds the contour that looks most like an ellipse.
+        Works by fitting an ellipse around the contour and
+        comparing the area. The ellipse with the least
+        area difference is considered the best choice.
+
+        :param contours: A list of contours.
+        :return: An cv2 ellipse.
         """
-        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        circles = cv2.HoughCircles(gray, cv2.cv.CV_HOUGH_GRADIENT, 1, 50, param1=20, param2=25, minRadius=10, maxRadius=0)
-        return circles
+
+        # TODO: Look slightly outside the button and look for the
+        # TODO: correct color of the ticket machine.
+
+        min_diff = None
+        best_ellipse = None
+
+        for contour in contours:
+
+            # The function cv2.contourArea() requires at least 5 points.
+            if len(contour) >= 5:
+
+                ellipse = cv2.fitEllipse(contour)
+                axis_a = ellipse[1][0] / 2
+                axis_b = ellipse[1][1] / 2
+
+                ellipse_area = math.pi * axis_a * axis_b
+                contour_area = cv2.contourArea(contour)
+                area_diff = abs(ellipse_area - contour_area)
+                area_diff_dec = abs(1 - ellipse_area / contour_area)
+
+                if area_diff_dec < 0.05:
+                    if min_diff is None:
+                        min_diff = area_diff
+                        best_ellipse = ellipse
+                    else:
+                        if min_diff > area_diff:
+                            min_diff = area_diff
+                            best_ellipse = ellipse
+
+        return best_ellipse
 
     def find_circles(self, cnt1, res):
         acc = 3
