@@ -82,14 +82,16 @@ def main():
 
         small = cv2.resize(frame, (0, 0), fx=scale, fy=scale)
 
-        sample = button_detector.find_button(small)
+        ellipse = button_detector.find_button(small)
 
         # TODO: Create a filter that looks at the sequence of
         # TODO: button positions reduce effects of drastic change,
         # TODO: likely caused by a mistake of the detector.
 
+        if ellipse:
+            cv2.ellipse(small, ellipse, (0, 255, 0), 3)
+
         cv2.imshow('original', small)
-        cv2.imshow('result', sample)
 
         if keyboard & 0xFF == ord('q'):
             break

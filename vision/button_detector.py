@@ -50,7 +50,10 @@ class ButtonDetector():
         if ellipse:
             cv2.ellipse(res, ellipse, (0, 255, 0), 3)
 
-        return res
+        # For debugging only.
+        # cv2.imshow("debug", res)
+
+        return ellipse
 
     def create_mask(self, image):
         """
