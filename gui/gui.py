@@ -287,7 +287,9 @@ class Button:
 
 
 def gui():
+
     manager = GUIManager((800, 600))
+
     flag = True
 
     def exit():
@@ -329,9 +331,9 @@ def gui():
         print(flag)
         current_time = time.time()
         manager.update()
-        
+        cv2.waitKey(10)
 
-    cv2.destroyAllWindows()
+    cv2.DestroyAllWindows()
 
 gui()
 
