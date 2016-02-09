@@ -322,7 +322,7 @@ def gui():
 
 
     manager.add_gui_element(grid_1)
-    manager.add_gui_element((grid_2))
+    manager.add_gui_element(grid_2)
 
     manager.set_current_object("panel1")
 
