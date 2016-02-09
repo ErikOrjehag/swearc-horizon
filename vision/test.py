@@ -1,5 +1,8 @@
 import numpy
 import cv2
+#from matplotlib import pyplot as plt
+
+
 
 def show_camera():
     cap = cv2.VideoCapture(1)
@@ -63,10 +66,10 @@ def corner_detect_harris():
         #img = cv2.imread('traindoor.jpg')
         gray = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
         gray = numpy.float32(gray)
-        dst = cv2.cornerHarris(gray, 2, 3, 0.04)
-        print(dst)
+        dst = cv2.cornerHarris(gray, 5, 25, 0.05)
+        #print(dst)
         dst = cv2.dilate(dst, None)
-        print(dst)
+        #print(dst)
 
         frame[dst>0.01*dst.max()] = [0, 0, 255]
 
@@ -77,7 +80,7 @@ def corner_detect_harris():
                    frame.item(row, pixel, 1) == 0 and \
                    frame.item(row, pixel, 2) == 255:
                     corners.append((row, pixel))
-        print(corners)
+        #print(corners)
 
         cv2.imshow('dst', frame)
         if cv2.waitKey(1) & 0xff == ord('q'):
@@ -233,3 +236,67 @@ def meanshift():
 
     cv2.destroyAllWindows()
     cap.release()
+
+
+def disparity_map():
+
+    cap_l = cv2.VideoCapture(1)
+    cap_r = cv2.VideoCapture(2)
+
+    #imgL = cv2.imread('traindoor.jpg',0)
+    #imgR = cv2.imread('traindoor.jpg',0)
+
+
+    while True:
+        ret_l, frame_l = cap_l.read()
+        ret_r, frame_r = cap_r.read()
+
+        gray_l = cv2.cvtColor(frame_l, cv2.COLOR_BGR2GRAY)
+        gray_r = cv2.cvtColor(frame_r, cv2.COLOR_BGR2GRAY)
+
+        #stereo = cv2.StereoBM(numDisparities=16, blockSize=15)
+        stereo = cv2.StereoBM(cv2.STEREO_BM_BASIC_PRESET,ndisparities=16,
+                              SADWindowSize=15)
+        disparity = stereo.compute(gray_l, gray_r)
+
+        cv2.imshow('3d', disparity)
+        cv2.imshow('left', gray_l)
+        cv2.imshow('right', gray_r)
+
+        keyboard = cv2.waitKey(1)
+        if keyboard & 0xFF == ord('q'):
+            break
+    cap_r.release()
+    cap_l.release()
+    cv2.destroyAllWindows()
+
+
+
+
+def haar_cascade():
+
+    face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+    body_cascade = cv2.CascadeClassifier('haarcascade_upperbody.xml')
+
+    cap = cv2.VideoCapture(1)
+
+    while True:
+        ret, frame = cap.read()
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+        bodys = body_cascade.detectMultiScale(gray, 1.3, 5)
+        for (x,y,w,h) in bodys:
+            cv2.rectangle(frame,(x,y),(x+w,y+h),(255,0,0),2)
+            gray[y:y+h, x:x+w]
+            frame[y:y+h, x:x+w]
+            faces = face_cascade.detectMultiScale(gray)
+            for (ex,ey,ew,eh) in faces:
+                cv2.rectangle(frame,(ex,ey),(ex+ew,ey+eh),(0,255,0),2)
+        cv2.imshow('frame', frame)
+
+        keyboard = cv2.waitKey(1)
+        if keyboard & 0xFF == ord('q'):
+            break
+    cap.release()
+    cv2.destroyAllWindows()
+
