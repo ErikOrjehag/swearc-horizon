@@ -291,6 +291,7 @@ def gui():
     flag = True
 
     def exit():
+        print("exit")
         flag = False
 
     def panel_1():
@@ -324,13 +325,13 @@ def gui():
 
     manager.set_current_object("panel1")
 
-    while True:
-        if not flag:
-            cv2.destroyAllWindows()
-            break
+    while flag:
+        print(flag)
         current_time = time.time()
         manager.update()
-        time.sleep(0.01)
+        
+
+    cv2.destroyAllWindows()
 
 gui()
 
