@@ -287,11 +287,13 @@ class Button:
 
 
 def gui():
+
     manager = GUIManager((800, 600))
-    flag = True
+
+    flag = [True]
 
     def exit():
-        flag = False
+        flag[0] = False
 
     def panel_1():
         manager.set_current_object("panel1")
@@ -320,17 +322,15 @@ def gui():
 
 
     manager.add_gui_element(grid_1)
-    manager.add_gui_element((grid_2))
+    manager.add_gui_element(grid_2)
 
     manager.set_current_object("panel1")
 
-    while True:
-        if not flag:
-            cv2.destroyAllWindows()
-            break
+    while flag[0] and cv2.waitKey(10) != ord('q'):
         current_time = time.time()
         manager.update()
-        time.sleep(0.01)
+
+    cv2.destroyAllWindows()
 
 gui()
 
