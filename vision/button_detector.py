@@ -51,7 +51,7 @@ class ButtonDetector():
             cv2.ellipse(res, ellipse, (0, 255, 0), 3)
 
         # For debugging only.
-        # cv2.imshow("debug", res)
+        cv2.imshow("debug", res)
 
         return ellipse
 
@@ -73,6 +73,7 @@ class ButtonDetector():
 
         # Create a mask (black and white) using the selected hsv range
         # tuned to find the button on the ticket machine.
+        # TODO: Use multiple ranges (red hue wraps around)
         mask = cv2.inRange(hsv, hsv_lower, hsv_upper)
 
         # Kernel slides through the image. A pixel will be considered
