@@ -18,7 +18,6 @@ Some code and wiring inspired by http://en.wikiversity.org/wiki/User:Dstaub/robo
 const int speedOfSound = 340;
 const float ms2mm = (speedOfSound / 1000.0);
 
-
 void setup() {
   Serial.begin (9600);
   pinMode(trigPin, OUTPUT);
