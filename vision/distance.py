@@ -4,25 +4,21 @@ import numpy as np
 from math import pi
 from button_detector import ButtonDetector
 
+
 class DistanceCalculator:
-    def __init__(self, real_close, real_far, screen_close, screen_far, real_size):
-        # self.k = (real_close - real_far) / (screen_close - screen_far)
-        # self.m = real_far - self.k * screen_far
+    def __init__(self, real_close, screen_close, real_size):
         self.w = real_size
-        self.p = screen_close
-        self.d = real_close
         self.f = (screen_close * real_close) / real_size
 
     def convert(self, screen_size):
         return (self.w * self.f) / screen_size
-        # return self.k * screen_size + self.m
 
 
 def main():
     capture_device = 0
     cap = cv2.VideoCapture(capture_device)
 
-    distCalc = DistanceCalculator(real_close=150., real_far=200., screen_close=230., screen_far=37., real_size=70.)
+    distCalc = DistanceCalculator(real_close=150., screen_close=230., real_size=70.)
 
     hsv_range = np.array([
         [ 66, 106, 118],

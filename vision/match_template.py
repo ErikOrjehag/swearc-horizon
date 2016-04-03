@@ -6,7 +6,7 @@ import numpy as np
 def main():
 
     template = cv2.imread(sys.argv[1])
-    template = cv2.resize(template, (0, 0), fx=0.5, fy=0.5)
+    template = cv2.resize(template, (0, 0), fx=0.2, fy=0.2)
     th, tw = template.shape[:2]
 
     cap = cv2.VideoCapture(0)
@@ -18,12 +18,12 @@ def main():
         ret, frame = cap.read()
         frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
 
-        threshold = 0.93
+        threshold = 0.92
         # loc = np.where(result >= threshold)
         # for pt in zip(*loc[::-1]):
         #    cv2.rectangle(frame, pt, (pt[0] + tw, pt[1] + th), (0, 0, 255), 2)
 
-        for scale in np.arange(1, 0.3, -0.1):
+        for scale in np.arange(1, 0.1, -0.1):
 
             result = cv2.matchTemplate(cv2.resize(frame, (0, 0), fx=scale, fy=scale), template, cv2.TM_CCORR_NORMED)
 
