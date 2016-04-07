@@ -12,7 +12,7 @@ class Communicator:
         self.ser = serial.Serial(port, 9600, timeout=0)
 
     def write(self, key, value):
-        self.ser.write(key + "=" + str(value))
+        self.ser.write(key + "=" + str(value) + ",")
 
     def read(self):
         reading = self.ser.readline()

@@ -24,7 +24,7 @@ def get_hsv_range():
 
 def main():
 
-    capture_device = 0
+    capture_device = 1
 
     if "--video" in sys.argv:
         capture_device = "ticket_button.mp4"
