@@ -1,4 +1,4 @@
-
+#include <HalMotor.h>
 #include <PID_v1.h>
 
 const int SENSORPIN_ORANGE = 2;
@@ -19,7 +19,6 @@ float lMotorMaxRotation;
 PID myPID(&currRPM, &currPWM, &goalRPM, 10,10,0, DIRECT);  //PID default range = 0 - 255 
 
 void setup() {
-  // put your setup code here, to run once:
   Serial.begin(9600);
   analogWrite(LMOTOR_PWM, 150);
   attachInterrupt(digitalPinToInterrupt(SENSORPIN_ORANGE), tick, FALLING);
@@ -82,5 +81,4 @@ void tick(){
   timeSinceUpdate = millis();
   timeCount = millis();
 }
-
 
