@@ -1,19 +1,17 @@
 #include "Arduino.h"
 #include "HalMotor.h"
 
-HalMotor::HalMotor(int RPin, int LPin, int SPin1, int SPin2, int pulsesPerRev, void (*interrupt)()) {
+HalMotor::HalMotor(int RPin, int LPin, int SPin, int pulsesPerRev, void (*interrupt)()) {
 	pinMode(RPin, OUTPUT);
 	pinMode(LPin, OUTPUT);
-	pinMode(SPin1, INPUT);
-	pinMode(SPin2, INPUT);
+	pinMode(SPin, INPUT);
 	_RPin = RPin;
 	_LPin = LPin;
-	_SPin1 = SPin1;
-	_SPin2 = SPin2;
+	_SPin = SPin;
 	_pulsesPerRev = pulsesPerRev;
-	pid = new PID(&_currRPM, &_currPWM, &_goalRPM, 10, 10, 0, DIRECT);
+	pid = new PID(&_currRPM, &_currPWM, &_goalRPM, 2, 8, 0, DIRECT);
 	analogWrite(RPin, 150);
-	attachInterrupt(digitalPinToInterrupt(SPin1), interrupt, FALLING);
+	attachInterrupt(digitalPinToInterrupt(SPin), interrupt, FALLING);
 	pid->SetMode(AUTOMATIC);
 	pid->SetSampleTime(50);
 }
@@ -22,8 +20,8 @@ HalMotor::~HalMotor() {
 	delete pid;
 }
 
-void HalMotor::drive(int pwm) {
-	
+void HalMotor::setRPM(int rpm) {
+	_goalRPM = rpm;
 }
 
 void HalMotor::update() {
@@ -35,6 +33,11 @@ void HalMotor::update() {
 
 	if (hasCompute) {
 		analogWrite(_RPin, _currPWM);
+
+		Serial.print("_currRPM: ");
+		Serial.print(_currRPM);
+		Serial.print(", _currPWM: ");
+		Serial.println(_currPWM);
 	}
 }
 
