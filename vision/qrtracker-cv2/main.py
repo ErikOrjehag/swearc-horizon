@@ -62,10 +62,10 @@ def loop(track, headless, ss, size):
                 data = out_im.tostring()
                 mode = out_im.mode
                 size = out_im.size
-                img = pygame.image.fromstring (data, size, mode)
-                screen.blit(img, (0,0))
-                screen.blit(img, (0,0))
-                pygame.display.flip()
+                #img = pygame.image.fromstring (data, size, mode)
+                #screen.blit(img, (0,0))
+                #screen.blit(img, (0,0))
+                #pygame.display.flip()
 
             #for k,v in labels.iteritems():
             #    if ss:
@@ -90,7 +90,7 @@ def loop(track, headless, ss, size):
                     same += 1
                 print frame_counter, "frames in", dt, "seconds (", frame_counter/dt, "fps ) data: " + text_data + " x " + str(x) +" y " + str(y) + \
                                                                                      " Width " + str(w) + " Height " + str(h)
-                if same == 20:
+                if same == 10:
                     print ("end")
                     return text_data, x, y, w, h
                 frame_counter = 0
@@ -136,12 +136,12 @@ if __name__=="__main__":
 
     src = camerasrc(size[0], size[1], device)
 
-    if not headless:
-        import pygame
-        pygame.init()
-        screen=pygame.display.set_mode(size)
-        pygame.display.set_caption("visualizer")
-        clock = pygame.time.Clock()
+    #if not headless:
+    #    import pygame
+    #    pygame.init()
+    #    screen=pygame.display.set_mode(size)
+    #    pygame.display.set_caption("visualizer")
+    #    clock = pygame.time.Clock()
 
     tracker.tracker_init(size, headless)
 
