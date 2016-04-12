@@ -81,6 +81,8 @@ def corner_detect_harris():
                    frame.item(row, pixel, 2) == 255:
                     corners.append((row, pixel))
         #print(corners)
+        corner.sort()
+        print(sort)
 
         cv2.imshow('dst', frame)
         if cv2.waitKey(1) & 0xff == ord('q'):
@@ -178,12 +180,16 @@ def detect_circle():
     """
     Think needs a newer version of cv2
     """
-    img = cv2.imread('index.jpeg')
+    img = cv2.imread('/home/zacno594/liu/robot_labbet/blidbehandling/index.jpeg')
+    print(img)
+    cv2.imshow('test', img)
     img = cv2.medianBlur(img, 5)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     cimg = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
     circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1, 20,
-                               param1=50, param2=30, minRadius=0, maxRadius=0)
+                               param1=50, param2=30, minRadius=0,
+                               maxRadius=100000)
 
     circles = numpy.uint16(numpy.around(circles))
     for i in circles[0, :]:
@@ -198,7 +204,7 @@ def detect_circle():
 
 
 def meanshift():
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(1)
 
     ret, frame = cap.read()
 
@@ -225,12 +231,13 @@ def meanshift():
             ret, track_window = cv2.meanShift(dst, track_window, term_crit)
 
             x, y, w, h = track_window
-            img2 = cv2.rectangle(frame, (x, y), (x+w, y+h), 255, 2)
+            #img2 = cv2.rectangle(frame, (x, y), (x+w, y+h), 255, 2)
+            cv2.rectangle(frame, (x, y), (x+w, y+h), 255, 2)
             k = cv2.waitKey(60) & 0xff
             if k == 27:
                 break
             else:
-                cv2.imwrite(chr(k) + ".jpg", img2)
+                cv2.imwrite(chr(k) + ".jpg", frame)
         else:
             break
 
@@ -257,6 +264,7 @@ def disparity_map():
         #stereo = cv2.StereoBM(numDisparities=16, blockSize=15)
         stereo = cv2.StereoBM(cv2.STEREO_BM_BASIC_PRESET,ndisparities=16,
                               SADWindowSize=15)
+        print(stereo)
         disparity = stereo.compute(gray_l, gray_r)
 
         cv2.imshow('3d', disparity)

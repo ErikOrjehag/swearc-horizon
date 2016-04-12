@@ -8,17 +8,8 @@ sys.path.append("./gst_camera_source")
 
 from multi_image_source import multiimagesrc
 import tracker
-import server
 
 import time
-
-
-def dump(track):
-    for k, v in track.iteritems():
-        f = open(k, "a")
-        for pt in v:
-            f.write(str(pt[1][0])+" "+str(pt[1][1])+" "+str(pt[1][2])+"\n")
-        f.close()
 
 usage = \
 """usage: qrtracker -d <device> -wh <size> -h\n
@@ -26,7 +17,6 @@ usage = \
      -wh  : <size> size of captured video frame in form AxB, for example: -wh 640x480\n
      -h   : run headless, dump track in the end
      -s   :
-     -dvr :
 """
 
 def parse_options(argv, expected_options):
@@ -43,12 +33,12 @@ def parse_options(argv, expected_options):
             opt = None
 
 
-def process_pygame_events():
-    for event in pygame.event.get():
-        if (event.type == pygame.KEYUP) or (event.type == pygame.KEYDOWN):
-            if (event.key == pygame.K_ESCAPE):
-                return True
-    return False
+#def process_pygame_events():
+#    for event in pygame.event.get():
+#        if (event.type == pygame.KEYUP) or (event.type == pygame.KEYDOWN):
+#            if (event.key == pygame.K_ESCAPE):
+#                return True
+#    return False
 
 
 def loop(track, headless, ss, size):
@@ -56,48 +46,59 @@ def loop(track, headless, ss, size):
     ctr = 0
     time_start = time.time()
     frame_counter = 0
+    same = 0
+    last_text = ""
     while not done:
-        if not headless:
-            done = process_pygame_events()
+        #if not headless:
+        #    done = process_pygame_events()
         if ss:
             ss.step()
 
         if src.has_data():
             cv_im = src.get_image()
 
-            out_im, labels = tracker.tracker_scan(cv_im, headless)
+            out_im, labels, text_data, x, y, w, h = tracker.tracker_scan(cv_im, headless)
             if not headless:
                 data = out_im.tostring()
                 mode = out_im.mode
                 size = out_im.size
                 img = pygame.image.fromstring (data, size, mode)
                 screen.blit(img, (0,0))
+                screen.blit(img, (0,0))
                 pygame.display.flip()
 
-            for k,v in labels.iteritems():
-                if ss:
-                    ms = float(max(size))
-                    ss.push_data((k, v[0]/ms, v[1]/ms, v[2]))
-                if k not in track:
-                    track[k] = []
-                track[k].append((ctr, v))
-            ctr+=1
-            if ctr%100 == 0: # dump tracks every 100 increments of ctr or at least try to
-                dump(track)
-                track={}
+            #for k,v in labels.iteritems():
+            #    if ss:
+            #        ms = float(max(size))
+            #        ss.push_data((k, v[0]/ms, v[1]/ms, v[2]))
+            #    if k not in track:
+            #        track[k] = []
+            #    track[k].append((ctr, v))
+            #ctr+=1
+            #if ctr%100 == 0: # dump tracks every 100 increments of ctr or at least try to
+            #    track={}
 
             time_now = time.time()
             frame_counter += 1
             dt = time_now - time_start
 
-            if (time_now - time_start) >= 5.0:
-                print frame_counter, "frames in", dt, "seconds (", frame_counter/dt, "fps )"
+            if (time_now - time_start) >= 0.1:
+                if last_text == "":
+                   last_text = text_data
+                elif text_data == last_text:
+                    last_text = text_data
+                    same += 1
+                print frame_counter, "frames in", dt, "seconds (", frame_counter/dt, "fps ) data: " + text_data + " x " + str(x) +" y " + str(y) + \
+                                                                                     " Width " + str(w) + " Height " + str(h)
+                if same == 20:
+                    print ("end")
+                    return text_data, x, y, w, h
                 frame_counter = 0
                 time_start = time.time()
 
 
 if __name__=="__main__":
-    options = {"-wh": None, "-d": None, "-h": None, "-s": None, "-dvr": None, "-host": None, "-port": None}
+    options = {"-wh": None, "-d": None, "-h": None, "-s": None, "-host": None, "-port": None}
     parse_options(sys.argv[1:], options)
     sys.argv = sys.argv[:1]
     from camera_source import camerasrc
@@ -121,19 +122,19 @@ if __name__=="__main__":
 
     serve = False
     ss = None
-    if options["-s"] == True:
-        host = "localhost"
-        if options["-host"]:
-            host = options["-host"]
-        port = 40000
-        if options["-port"]:
-            port = options["-port"]
-        serve = True
-        ss = server.socket_server(host, port)
+    #if options["-s"] == True:
+    #    host = "localhost"
+    #    if options["-host"]:
+    #        host = options["-host"]
+    #    port = 40000
+    #    if options["-port"]:
+    #        port = options["-port"]
+    #    serve = True
+    #    ss = server.socket_server(host, port)
 
-    dvr = False
-    if options["-dvr"] == True:
-        dvr = True
+
+
+    src = camerasrc(size[0], size[1], device)
 
     if not headless:
         import pygame
@@ -142,15 +143,11 @@ if __name__=="__main__":
         pygame.display.set_caption("visualizer")
         clock = pygame.time.Clock()
 
-    src = camerasrc(size[0], size[1], device)
-
     tracker.tracker_init(size, headless)
 
     track = {}
     try:
-        loop(track, headless, ss, size)
+        print (loop(track, headless, ss, size))
     except KeyboardInterrupt:
         print "finalizing"
 
-    # final dump
-    dump(track)
