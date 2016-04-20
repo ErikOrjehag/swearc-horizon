@@ -21,7 +21,13 @@ HalMotor::~HalMotor() {
 }
 
 void HalMotor::setRPM(int rpm) {
-	_goalRPM = rpm;
+	if (rpm < 0) {
+		_reverse = true;
+		_goalRPM = -rpm;
+	} else {
+		_reverse = false;
+		_goalRPM = rpm;
+	}
 }
 
 void HalMotor::update() {
@@ -32,19 +38,20 @@ void HalMotor::update() {
 	}
 
 	if (hasCompute) {
-		analogWrite(_RPin, _currPWM);
-
-		Serial.print("_currRPM: ");
-		Serial.print(_currRPM);
-		Serial.print(", _currPWM: ");
-		Serial.println(_currPWM);
+		//Serial.println((_goalRPM == 0) ? 0 : _currPWM);
+		analogWrite(_reverse ? _RPin : _LPin, 0);
+		analogWrite(_reverse ? _LPin : _RPin, (_goalRPM == 0) ? 0 : _currPWM);
 	}
 }
 
 void HalMotor::tick() {
-	double peakToPeakTime = millis() - _lastTickTimestamp;
-	_currRPM = millisPerPulseToRPM(peakToPeakTime);
+	unsigned long peakToPeakTime = millis() - _lastTickTimestamp;
 	_lastTickTimestamp = millis();
+	//Serial.println(peakToPeakTime);
+	// Prevent division with zero.
+	//if (peakToPeakTime > 0) {
+		_currRPM = millisPerPulseToRPM(peakToPeakTime);
+	//}
 }
 
 float HalMotor::millisPerPulseToRPM(double millis) {

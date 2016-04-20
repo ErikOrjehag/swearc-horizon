@@ -10,7 +10,7 @@ void setup() {
 }
 
 void loop() {
-  float val = sin(millis() * 0.002) * 90 + 90;
+  float val = ((sin(millis() * 0.002) - 1) / 2) * 40 + 90;
   Serial.println(val);
   servo.write(val);
   delay(10);

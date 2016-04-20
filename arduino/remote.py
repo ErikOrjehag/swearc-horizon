@@ -8,6 +8,8 @@ import numpy as np
 
 def main():
 
+    lightIsOn = False
+
     arduino = Arduino()
     cv2.imshow("asd", np.zeros((200, 200, 3), dtype=np.uint8))
     keyboard = cv2.waitKey(1)
@@ -16,18 +18,23 @@ def main():
         keyboard = cv2.waitKey(1)
 
         if keyboard == ord("w"):
-            arduino.send("arm", 1)
-        elif keyboard == ord("e"):
-            arduino.send("arm", 0)
-        elif keyboard == ord("r"):
-            arduino.send("arm", -1)
-
-        elif keyboard == ord("a"):
-            arduino.send("wheel", 1)
+            arduino.send("rspeed", 20)
+            arduino.send("lspeed", 20)
         elif keyboard == ord("s"):
-            arduino.send("wheel", 0)
+            arduino.send("rspeed", -20)
+            arduino.send("lspeed", -20)
+        elif keyboard == ord("a"):
+            arduino.send("rspeed", 20)
+            arduino.send("lspeed", -20)
         elif keyboard == ord("d"):
-            arduino.send("wheel", -1)
+            arduino.send("rspeed", -20)
+            arduino.send("lspeed", 20)
+        elif keyboard == ord("e"):
+            arduino.send("rspeed", 0)
+            arduino.send("lspeed", 0)
+        elif keyboard == ord("r"):
+            lightIsOn = not lightIsOn
+            arduino.send("light", lightIsOn)
 
 if __name__ == "__main__":
     main()

@@ -19,11 +19,12 @@ private:
 	int _LPin;
 	int _SPin;
 	int _pulsesPerRev;
-	const unsigned int _freezeTimeMs = 200;
+	unsigned int _freezeTimeMs = 200;
 	unsigned long _lastTickTimestamp = 0;
 	double _currRPM = 0;
 	double _currPWM = 0;
 	double _goalRPM = 0;
+	bool _reverse = false;
 	PID *pid;
 
 };
