@@ -1,0 +1,10 @@
+data/gst_camera_source/camera_source.py.i
+data/gst_camera_source/imagesrc.py.i
+data/plot.gsh.i
+data/server.py.i
+data/gst_camera_source/multi_image_source.py.i
+data/tracker.py.i
+data/qr_generator.py.i
+data/camera_prepare.sh.i
+data/plot_tracks.gsh.i
+data/main.py.i

@@ -42,12 +42,14 @@ def parse_options(argv, expected_options):
             expected_options[opt] = o
             opt = None
 
+
 def process_pygame_events():
     for event in pygame.event.get():
         if (event.type == pygame.KEYUP) or (event.type == pygame.KEYDOWN):
             if (event.key == pygame.K_ESCAPE):
                 return True
     return False
+
 
 def loop(track, headless, ss, size):
     done = False
