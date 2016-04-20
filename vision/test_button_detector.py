@@ -24,7 +24,7 @@ def get_hsv_range():
 
 def main():
 
-    capture_device = 1
+    capture_device = 0
 
     if "--video" in sys.argv:
         capture_device = "ticket_button.mp4"
@@ -32,15 +32,9 @@ def main():
     cap = cv2.VideoCapture(capture_device)
 
     hsv_range = np.array([
-        [0, 115, 115],
-        [15, 255, 255]
+        [140, 160, 115],
+        [255, 255, 200]
     ])
-
-    if "--ticket" in sys.argv:
-        hsv_range = np.array([
-            [0, 115, 157],
-            [15, 255, 216]
-        ])
 
     button_detector = ButtonDetector(hsv_range)
 
@@ -63,6 +57,7 @@ def main():
 
     scale = 0.5
     ret, frame = cap.read()
+    print(frame)
     small = cv2.resize(frame, (0, 0), fx=scale, fy=scale)
 
     while True:
