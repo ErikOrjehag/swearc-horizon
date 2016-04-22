@@ -1,0 +1,45 @@
+
+import cv2
+from button_detector import ButtonDetector
+
+def main():
+    capture_device = 0
+    
+    cap = cv2.VideoCapture(capture_device)
+
+    hsv_range = np.array([
+        [140, 160, 115],
+        [255, 255, 200]
+    ])
+
+    button_detector = ButtonDetector(hsv_range)
+
+    scale = 0.5
+
+    while True:
+
+        # Input
+        keyboard = cv2.waitKey(1)
+
+        ret, frame = cap.read()
+
+        small = cv2.resize(frame, (0, 0), fx=scale, fy=scale)
+
+        ellipse = button_detector.find_button(small)
+
+        if ellipse:
+            cv2.ellipse(small, ellipse, (0, 255, 0), 3)
+
+        cv2.imshow('frame', small)
+
+        if keyboard & 0xFF == ord('q'):
+            break
+
+    cap.release()
+    cv2.destroyAllWindows()
+
+
+
+
+if __name__ == "__main__":
+    main()

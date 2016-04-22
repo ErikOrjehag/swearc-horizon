@@ -67,14 +67,18 @@ class ButtonDetector():
 
         # Convert image from BGR to HSV because it's easier to work
         # with when we want to find the color of the button.
-        hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
-        hsv_lower = self._hsv_range[0]
-        hsv_upper = self._hsv_range[1]
+        hsv_image = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
 
-        # Create a mask (black and white) using the selected hsv range
-        # tuned to find the button on the ticket machine.
-        # TODO: Use multiple ranges (red hue wraps around)
-        mask = cv2.inRange(hsv, hsv_lower, hsv_upper)
+        mask = np.zeros(image.shape[:2], np.uint8)
+
+        for hsv_range in self._hsv_range:
+            hsv_lower = hsv_range[0]
+            hsv_upper = hsv_range[1]
+
+            # Create a mask (black and white) using the selected hsv range
+            # tuned to find the button on the ticket machine.
+            temp_mask = cv2.inRange(hsv_image, hsv_lower, hsv_upper)
+            mask = cv2.bitwise_or(mask, temp_mask)
 
         # Kernel slides through the image. A pixel will be considered
         # white only if all pixels under the kernel are white.

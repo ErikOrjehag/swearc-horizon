@@ -1,11 +1,9 @@
 
 from communicator import Communicator
-from config import serial_port
-
 
 class Arduino:
 
-    def __init__(self):
+    def __init__(self, serial_port):
         self.com = Communicator(serial_port)
         self.values = dict()
 

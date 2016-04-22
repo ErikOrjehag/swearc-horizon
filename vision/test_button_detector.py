@@ -15,10 +15,10 @@ def get_hsv_range():
     hueu = cv2.getTrackbarPos("Hue_Upper", 'image')
     satu = cv2.getTrackbarPos("Sat_Upper", 'image')
     viu = cv2.getTrackbarPos("Vi_Upper", 'image')
-    hsv_range = np.array([
+    hsv_range = np.array([[
         [huel, satl, vil],
         [hueu, satu, viu]
-    ])
+    ]])
     return hsv_range
 
 
@@ -31,10 +31,10 @@ def main():
 
     cap = cv2.VideoCapture(capture_device)
 
-    hsv_range = np.array([
+    hsv_range = np.array([[
         [140, 160, 115],
         [255, 255, 200]
-    ])
+    ]])
 
     button_detector = ButtonDetector(hsv_range)
 
@@ -44,12 +44,12 @@ def main():
         button_detector.set_hsv_range(new_hsv_range)
 
     cv2.namedWindow('image', flags=cv2.WINDOW_NORMAL)
-    cv2.createTrackbar("Hue_Lower", 'image', hsv_range[0][0], 255, trackbar_cb)
-    cv2.createTrackbar("Hue_Upper", 'image', hsv_range[1][0], 255, trackbar_cb)
-    cv2.createTrackbar("Sat_Lower", 'image', hsv_range[0][1], 255, trackbar_cb)
-    cv2.createTrackbar("Sat_Upper", 'image', hsv_range[1][1], 255, trackbar_cb)
-    cv2.createTrackbar("Vi_Lower", 'image', hsv_range[0][2], 255, trackbar_cb)
-    cv2.createTrackbar("Vi_Upper", 'image', hsv_range[1][2], 255, trackbar_cb)
+    cv2.createTrackbar("Hue_Lower", 'image', hsv_range[0][0][0], 255, trackbar_cb)
+    cv2.createTrackbar("Hue_Upper", 'image', hsv_range[0][1][0], 255, trackbar_cb)
+    cv2.createTrackbar("Sat_Lower", 'image', hsv_range[0][0][1], 255, trackbar_cb)
+    cv2.createTrackbar("Sat_Upper", 'image', hsv_range[0][1][1], 255, trackbar_cb)
+    cv2.createTrackbar("Vi_Lower", 'image', hsv_range[0][0][2], 255, trackbar_cb)
+    cv2.createTrackbar("Vi_Upper", 'image', hsv_range[0][1][2], 255, trackbar_cb)
 
 
     startTime = time.time()
