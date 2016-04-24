@@ -1,14 +1,4 @@
-//#include <PID_v1.h>
-
-void setup() {
-  
-}
-
-void loop() {
-  
-}
-/*
-//#include <HalMotor.h>
+#include <HalMotor.h>
 
 // Interrupt ports on mega are: 2, 3, 18, 19, 20, 21
 // Interrupt ports on nano are: 2, 3
@@ -86,4 +76,3 @@ void readSerialInput() {
     }
   }
 }
-*/
