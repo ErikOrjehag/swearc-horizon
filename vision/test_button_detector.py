@@ -55,7 +55,7 @@ def main():
     startTime = time.time()
     prevTime = None
 
-    scale = 0.5
+    scale = 1.0
     ret, frame = cap.read()
     print(frame)
     small = cv2.resize(frame, (0, 0), fx=scale, fy=scale)
