@@ -104,6 +104,7 @@ elif img is not None and not corner:
     kp, des = orb.compute(img, kp)
 
     img2 = cv2.drawKeypoints(img,kp,color=(0,255,0), flags=0)
+
     cv2.namedWindow("Corner")
     cv2.imshow("Corner",img2)
 
