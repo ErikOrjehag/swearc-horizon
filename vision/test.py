@@ -123,22 +123,25 @@ def corner_detect_gftt():
     """
     Uses cv2.goodFeaturesToTrack() to find corners
     """
-    img = cv2.imread('chessboard.jpg')
-    gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+    img = cv2.imread('OpenCV_Chessboard.png')
+    if img is not None:
+        gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 
-    corners = cv2.goodFeaturesToTrack(gray, 1000, 0.001, 0.1, 10)
-    # 25 is the number of corners that shall be found
-    # 0 is the quality level, can be between 0-1
-    # 0.1 and 10 is the minimum euclidean distance between corners
-    corners = numpy.int0(corners)
+        corners = cv2.goodFeaturesToTrack(gray, 10, 0.001, 0.1, 10)
+        # 25 is the number of corners that shall be found
+        # 0 is the quality level, can be between 0-1
+        # 0.1 and 10 is the minimum euclidean distance between corners
+        corners = numpy.int0(corners)
 
-    for i in corners:
-        x,y = i.ravel()
-        cv2.circle(img, (x,y), 3, 255, -1)
+        for i in corners:
+            x,y = i.ravel()
+            cv2.circle(img, (x,y), 3, 255, -1)
 
-    cv2.imshow('gftt', img)
-    if cv2.waitKey(0) & 0xff == 27:
-        cv2.destroyAllWindows()
+        cv2.imshow('gftt', img)
+        if cv2.waitKey(0) & 0xff == 27:
+            cv2.destroyAllWindows()
+    else:
+        print("Ingen bild")
 
 
 def corner_detect_sift():
