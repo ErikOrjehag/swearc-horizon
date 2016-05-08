@@ -11,7 +11,7 @@ def main():
     lightIsOn = False
 
     mega = Arduino("/dev/ttyUSB0")
-    nano = Arduino("/dev/ttyUSB2")
+    nano = Arduino("/dev/ttyUSB1")
 
     cv2.imshow("asd", np.zeros((200, 200, 3), dtype=np.uint8))
     
