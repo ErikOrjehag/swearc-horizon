@@ -5,10 +5,9 @@ import cv2
 import numpy as np
 from arduino.arduino import Arduino
 from vision.button_detector import ButtonDetector
+from config import capture_device, mega_usb
 
 def main():
-    capture_device = 0
-    
     cap = cv2.VideoCapture(capture_device)
 
     hsv_range = np.array([[
@@ -18,14 +17,27 @@ def main():
         [0, 80, 100],
         [30, 255, 255]
     ]])
-    """hsv_range = np.array([[
-        [0, 0, 0],
-        [255, 50, 50]
-    ]])"""
+
+    # kalman = cv2.KalmanFilter(2, 2)
+    # kalman.measurementMatrix = np.array([[1,0,0,0],[0,1,0,0]],np.float32)
+    # kalman.transitionMatrix = np.array([[1,0,1,0],[0,1,0,1],[0,0,1,0],[0,0,0,1]],np.float32)
+    # kalman.processNoiseCov = np.array([[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]],np.float32) * 0.03
+    # mp = np.array([[np.float32(10)], [np.float32(20)]])
+    # kalman.correct(mp)
+    # tp = kalman.predict()
+    # print(tp)
+
+    x = 10
+    y = 20
+
+    
+
+
+    return
 
     button_detector = ButtonDetector(hsv_range)
-    arduino = Arduino("/dev/ttyUSB0")
-    arduino.send("light", True)    
+    mega = Arduino(mega_usb)
+    mega.send("light", True)
 
     scale = 0.5
     x = 0
@@ -59,8 +71,8 @@ def main():
         speed = xnorm * 25 # rpm
 
         if counter % 10 == 0:
-            arduino.send("lspeed", speed)
-            arduino.send("rspeed", -speed)
+            mega.send("lspeed", speed)
+            mega.send("rspeed", -speed)
             print(speed)
 
         cv2.imshow('frame', small)
