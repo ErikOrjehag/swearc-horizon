@@ -19,19 +19,19 @@ def main():
 
     while keyboard != ord("q"):
         keyboard = cv2.waitKey(10) & 0xFF
-
+        speed = 30
         if keyboard == ord("w"):
-            mega.send("rspeed", 20)
-            mega.send("lspeed", 20)
+            mega.send("rspeed", speed)
+            mega.send("lspeed", speed)
         elif keyboard == ord("s"):
-            mega.send("rspeed", -20)
-            mega.send("lspeed", -20)
+            mega.send("rspeed", -speed)
+            mega.send("lspeed", -speed)
         elif keyboard == ord("a"):
-            mega.send("rspeed", 20)
-            mega.send("lspeed", -20)
+            mega.send("rspeed", speed)
+            mega.send("lspeed", -speed)
         elif keyboard == ord("d"):
-            mega.send("rspeed", -20)
-            mega.send("lspeed", 20)
+            mega.send("rspeed", -speed)
+            mega.send("lspeed", speed)
         elif keyboard == ord("e"):
             mega.send("rspeed", 0)
             mega.send("lspeed", 0)

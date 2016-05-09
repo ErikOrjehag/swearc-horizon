@@ -4,7 +4,7 @@ import numpy as np
 from math import pi
 from button_detector import ButtonDetector
 
-
+"""
 class DistanceCalculator:
     def __init__(self, real_close, screen_close, real_size):
         self.w = real_size
@@ -12,22 +12,34 @@ class DistanceCalculator:
 
     def convert(self, screen_size):
         return (self.w * self.f) / screen_size
+"""
+
+class DistanceCalculator:
+    def __init__(self, distance_mm, size_px):
+        self.size_px = size_px
+        self.distance_mm = distance_mm
+
+    def convert(self, px):
+        return (self.size_px * self.distance_mm) / px
 
 
 def main():
     capture_device = 0
     cap = cv2.VideoCapture(capture_device)
 
-    distCalc = DistanceCalculator(real_close=150., screen_close=230., real_size=70.)
+    distCalc = DistanceCalculator(distance_mm=250., size_px=207.)
 
-    hsv_range = np.array([
-        [ 66, 106, 118],
+    hsv_range = np.array([[
+        [130, 80, 100],
         [255, 255, 255]
-    ])
+    ], [
+        [0, 80, 100],
+        [30, 255, 255]
+    ]])
 
     buttonDetector = ButtonDetector(hsv_range)
 
-    scale = 0.5
+    scale = 1
     ret, frame = cap.read()
     frame = cv2.resize(frame, (0, 0), fx=scale, fy=scale)
 
@@ -56,6 +68,7 @@ def main():
             cv2.line(frame, pos, width_line, (255, 255, 255), 2)
 
             distance = distCalc.convert(height)
+            print(height)
 
             #print distance
             #print diameter
