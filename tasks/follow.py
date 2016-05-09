@@ -20,29 +20,34 @@ def main():
         [30, 255, 255]
     ]])
 
-    # kalman = cv2.KalmanFilter(2, 2)
-    # kalman.measurementMatrix = np.array([[1,0,0,0],[0,1,0,0]],np.float32)
-    # kalman.transitionMatrix = np.array([[1,0,1,0],[0,1,0,1],[0,0,1,0],[0,0,0,1]],np.float32)
-    # kalman.processNoiseCov = np.array([[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]],np.float32) * 0.03
-    # mp = np.array([[np.float32(10)], [np.float32(20)]])
-    # kalman.correct(mp)
-    # tp = kalman.predict()
-    # print(tp)
+    kalman = cv2.cv.CreateKalman(4, 2, 0)
 
-    x = 10
-    y = 20
+    kalman.transition_matrix[0, 0] = 1
+    kalman.transition_matrix[1, 1] = 1
+    kalman.transition_matrix[2, 2] = 1
+    kalman.transition_matrix[3, 3] = 1
+    kalman.transition_matrix[0, 2] = 1
+    kalman.transition_matrix[1, 3] = 1
 
-    
+    kalman.state_pre[0, 0] = 0
+    kalman.state_pre[1, 0] = 0
+    kalman.state_pre[2, 0] = 0
+    kalman.state_pre[3, 0] = 0
 
-    return
+    cv2.cv.SetIdentity(kalman.measurement_matrix, cv2.cv.RealScalar(1))
+    cv2.cv.SetIdentity(kalman.process_noise_cov, cv2.cv.RealScalar(1e-5)) # 1e-5
+    cv2.cv.SetIdentity(kalman.measurement_noise_cov, cv2.cv.RealScalar(1e-1))
+    cv2.cv.SetIdentity(kalman.error_cov_post, cv2.cv.RealScalar(0.1))
+
+    prediction = cv2.cv.KalmanPredict(kalman)
+    print(prediction[0, 0], prediction[1, 0])
 
     button_detector = ButtonDetector(hsv_range)
-    mega = Arduino(mega_usb)
-    mega.send("light", True)
+    # mega = Arduino(mega_usb)
+    # mega.send("light", True)
     distCalc = DistanceCalculator(distance_mm=250., size_px=207.)
 
     scale = 1.0
-    x = 0
     counter = 0
 
     while True:
@@ -58,30 +63,36 @@ def main():
 
         ellipse = button_detector.find_button(small)
 
-        xnow = 0
-        znorm = 0
-
         if ellipse:
+            print(ellipse)
             cv2.ellipse(small, ellipse, (0, 255, 0), 3)
-            xnow = ellipse[0][0] - small.shape[1] / 2
+            x = ellipse[0][0] - small.shape[1] / 2
             height = ellipse[1][1]
-            distance = distCalc.convert(height)
-            znorm = min(1, max(-1, (distance - 120) / 500))
-            print(znorm)
+            correct = cv2.cv.CreateMat(2, 1, cv2.cv.CV_32FC1)
+            correct[0, 0] = x
+            correct[1, 0] = height
+            cv2.cv.KalmanCorrect(kalman, correct)
 
-        x += (xnow - x) * 0.05
-        
-        cv2.line(small, (small.shape[1] / 2, small.shape[0] / 2), (int((small.shape[1] / 2) + x), small.shape[0] / 2), (255, 0, 0), 3)
-        
-        xnorm = min(1, max(-1, x / (small.shape[1] / 2)))
+        prediction = cv2.cv.KalmanPredict(kalman)
+        #print(prediction[0, 0], prediction[1, 0])
 
-        rspeed = lspeed = znorm * 20 # rpm
-        rspeed -= xnorm * 20
-        lspeed += xnorm * 20
+        if prediction[1, 0]:
+            distance = distCalc.convert(prediction[1, 0])
+            x = prediction[0, 0]
 
-        if counter % 20 == 0:
-            arduino.send("lspeed", lspeed)
-            arduino.send("rspeed", rspeed)
+            cv2.line(small, (small.shape[1] / 2, small.shape[0] / 2), (int((small.shape[1] / 2) + x), small.shape[0] / 2), (255, 0, 0), 3)
+
+            distnorm = min(1, max(-1, (distance - 120) / 500))
+            xnorm = min(1, max(-1, x / (small.shape[1] / 2)))
+
+            rspeed = lspeed = distnorm * 20
+            rspeed -= xnorm * 20
+            lspeed += xnorm * 20
+
+            if counter % 20 == 0:
+                # mega.send("lspeed", lspeed)
+                # mega.send("rspeed", rspeed)
+                pass
 
         cv2.imshow('frame', small)
 

@@ -48,7 +48,7 @@ class ButtonDetector():
         cv2.drawContours(res, contours, -1, (255, 255, 255), 1)
 
         if ellipse:
-            cv2.ellipse(res, ellipse, (0, 255, 0), 3)
+           cv2.ellipse(res, ellipse, (0, 255, 0), 3)
 
         # For debugging only.
         cv2.imshow("debug", res)

@@ -28,7 +28,7 @@ class Communicator:
             return None
 
         try:
-            if key in ["test"]:
+            if key in ["dsonar"]:
                 value = float(value)
             elif key in []:
                 value = int(value)

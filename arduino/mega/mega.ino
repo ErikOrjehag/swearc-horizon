@@ -28,14 +28,28 @@ int lightPin = 22;
 long lightTimer = millis();
 bool lightTimerOn = false;
 
+# Sonar sensors
+int lSonarTrigPin = 24;
+int lSonarEchoPin = 25;
+int rSonarTrigPin = 26;
+int rSonarEchoPin = 27;
+int dSonarTrigPin = 28;
+int dSonarEchoPin = 29;
+int fSonarTrigPin = 30;
+int fSonarEchoPin = 31;
+const int speedOfSound = 340;
+const float ms2mm = (speedOfSound / 1000.0);
+
 void setup() {
   Serial.begin(9600);
   pinMode(lightPin, OUTPUT);
-  //motorBR.setRPM(20);
+  pinMode(dSonarTrigPin, OUTPUT);
+  pinMode(dSonarEchoPin, INPUT);
 }
 
 void loop() {
   readSerialInput();
+  readSonarSensors();
   
   motorFL.update();
   motorFR.update();
@@ -47,6 +61,8 @@ void loop() {
     lightTimer = millis();
     digitalWrite(lightPin, lightTimerOn && lightCmdOn);
   }
+
+  delay(10);
 }
 
 void readSerialInput() {
@@ -75,4 +91,22 @@ void readSerialInput() {
       Serial.println("Unrecognized command!");
     }
   }
+}
+
+void readSonarSensors() {
+  long duration, distance;
+  // Ensure clean HIGH pulse by first giving a short LOW
+  digitalWrite(dSonarTrigPin, LOW);
+  delayMicroseconds(5);
+
+  digitalWrite(dSonarTrigPin, HIGH);
+  delayMicroseconds(25);
+  digitalWrite(dSonarTrigPin, LOW);
+
+  duration = pulseIn(dSonarEchoPin, HIGH);
+  distance = (duration / 2) * ms2mm;
+
+  String data = "distance=";
+  data.concat(distance);
+  Serial.println(data);
 }
