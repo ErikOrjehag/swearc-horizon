@@ -1,18 +1,10 @@
-
+import sys, os
+sys.path.insert(0, os.path.abspath(".."))
 import cv2
 import numpy as np
 from math import pi
 from button_detector import ButtonDetector
-
-"""
-class DistanceCalculator:
-    def __init__(self, real_close, screen_close, real_size):
-        self.w = real_size
-        self.f = (screen_close * real_close) / real_size
-
-    def convert(self, screen_size):
-        return (self.w * self.f) / screen_size
-"""
+import config
 
 class DistanceCalculator:
     def __init__(self, distance_mm, size_px):
@@ -29,13 +21,7 @@ def main():
 
     distCalc = DistanceCalculator(distance_mm=250., size_px=207.)
 
-    hsv_range = np.array([[
-        [130, 80, 100],
-        [255, 255, 255]
-    ], [
-        [0, 80, 100],
-        [30, 255, 255]
-    ]])
+    hsv_range = np.array(config.btn_hsv_range)
 
     buttonDetector = ButtonDetector(hsv_range)
 
