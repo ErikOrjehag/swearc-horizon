@@ -1,10 +1,12 @@
 #include <HalMotor.h>
+#include <Servo.h>
 
 // Interrupt ports on mega are: 2, 3, 18, 19, 20, 21
 // Interrupt ports on nano are: 2, 3
 
 // Pulses per revolution
 int ppr = 1340;
+
 
 // This is called forward declaration of functions.
 void tickFL();
@@ -22,13 +24,20 @@ void tickFR() { motorFR.tick(); }
 void tickBL() { motorBL.tick(); }
 void tickBR() { motorBR.tick(); }
 
+// Camera servo
+int servoPin = 44;
+Servo servo;
+
+// Start button
+int startPin = 32;
+
 // Blue LED lights under the robot.
 bool lightCmdOn = false;
 int lightPin = 22;
 long lightTimer = millis();
 bool lightTimerOn = false;
 
-# Sonar sensors
+// Sonar sensors
 int lSonarTrigPin = 24;
 int lSonarEchoPin = 25;
 int rSonarTrigPin = 26;
@@ -45,12 +54,15 @@ void setup() {
   pinMode(lightPin, OUTPUT);
   pinMode(dSonarTrigPin, OUTPUT);
   pinMode(dSonarEchoPin, INPUT);
+  servo.attach(servoPin);
+  servo.write(90);
 }
 
 void loop() {
   readSerialInput();
   readSonarSensors();
-  
+  readButtons();
+
   motorFL.update();
   motorFR.update();
   motorBL.update();
@@ -66,27 +78,27 @@ void loop() {
 }
 
 void readSerialInput() {
-  if (Serial.available() > 0) {  
+  if (Serial.available() > 0) {
     String command = Serial.readStringUntil('=');
     String value = Serial.readStringUntil(',');
 
     Serial.print(command);
     Serial.print(" ");
     Serial.println(value);
-    
+
     if (command == "rspeed") {
       int rpm = value.toInt();
       motorFR.setRPM(rpm);
       motorBR.setRPM(rpm);
-      
+
     } else if (command == "lspeed") {
       int rpm = value.toInt();
       motorFL.setRPM(rpm);
       motorBL.setRPM(rpm);
-      
+
     } else if (command == "light") {
       lightCmdOn = (value == "True");
-      
+
     } else {
       Serial.println("Unrecognized command!");
     }
@@ -108,5 +120,12 @@ void readSonarSensors() {
 
   String data = "distance=";
   data.concat(distance);
+  Serial.println(data);
+}
+
+void readButtons() {
+  int button = digitalRead(startPin);
+  String data = "start=";
+  data.concat(button);
   Serial.println(data);
 }

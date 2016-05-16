@@ -1,7 +1,21 @@
 
-def state_celebrate():
-
-	def inner(itr, fsm, frame):
+from time import time
 
 
-	return inner
+def state_celebrate(mega):
+
+    ts = [0]
+
+    def inner(itr, fsm, frame):
+
+        print("celebrate")
+
+        if itr == 0:
+            ts[0] = time()
+            mega.send("light", True)
+
+        elif time() - ts > 5:
+            mega.send("light", False)
+            exit(0)
+
+    return inner

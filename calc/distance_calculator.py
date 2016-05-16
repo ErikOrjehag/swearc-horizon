@@ -2,9 +2,9 @@ import sys, os
 sys.path.insert(0, os.path.abspath(".."))
 import cv2
 import numpy as np
-from math import pi
-from button_detector import ButtonDetector
+from vision.button_detector import ButtonDetector
 import config
+
 
 class DistanceCalculator:
     def __init__(self, distance_mm, size_px):

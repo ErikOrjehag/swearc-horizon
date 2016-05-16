@@ -1,20 +1,22 @@
 import sys, os
 sys.path.insert(0, os.path.abspath(".."))
-from math.distance_calculator import DistanceCalculator
+from calc.distance_calculator import DistanceCalculator
 from vision.button_detector import ButtonDetector
 from time import time
 import config
+import cv2
 
 def state_move_to_button(kalman, mega, nano, dist_to_btn):
 
-	distance_calculator = DistanceCalculator(distance_mm=250., size_px=207.)
+    distance_calculator = DistanceCalculator(distance_mm=250., size_px=207.)
     button_detector = ButtonDetector(config.btn_hsv_range)
 
-	sent_speed_ts = time()
+    sent_speed_ts = [time()]
+    minspeed = 8
 
-	def inner(itr, fsm, frame):
+    def inner(itr, fsm, frame):
 
-		ellipse = button_detector.find_button(frame)
+        ellipse = button_detector.find_button(frame)
 
         if ellipse:
             cv2.ellipse(frame, ellipse, (0, 255, 0), 3)
@@ -27,8 +29,10 @@ def state_move_to_button(kalman, mega, nano, dist_to_btn):
 
         prediction = cv2.cv.KalmanPredict(kalman)
 
-        distance = distance_calculator.convert(prediction[1, 0])
         x = prediction[0, 0]
+        height = prediction[1, 0]
+
+        distance = distance_calculator.convert(height) if height else 500
 
         cv2.line(frame, (frame.shape[1] / 2, frame.shape[0] / 2), (int((frame.shape[1] / 2) + x), frame.shape[0] / 2), (255, 0, 0), 3)
 
@@ -37,8 +41,8 @@ def state_move_to_button(kalman, mega, nano, dist_to_btn):
 
         rspeed = lspeed = max(distnorm * 20, minspeed)
 
-        if time() - sent_speed_ts > 0.1:
-            sent_speed_ts = time()
+        if time() - sent_speed_ts[0] > 0.1:
+            sent_speed_ts[0] = time()
 
             if distance > dist_to_btn:
                 mega.send("lspeed", lspeed + xnorm * 20)
@@ -48,5 +52,5 @@ def state_move_to_button(kalman, mega, nano, dist_to_btn):
                 mega.send("rspeed", 0)
                 fsm.pop_state()
 
-	return inner
+    return inner
 

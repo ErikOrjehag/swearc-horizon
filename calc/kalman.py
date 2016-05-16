@@ -1,4 +1,7 @@
 
+import cv2
+
+
 def create_default_kalman():
     kalman = cv2.cv.CreateKalman(4, 2, 0)
 

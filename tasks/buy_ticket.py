@@ -8,36 +8,37 @@ from ai.state_find_button import state_find_button
 from ai.state_wait_until_start import state_wait_until_start
 from ai.state_move_to_button import state_move_to_button
 from ai.state_push_button import state_push_button
-from math.kalman import create_default_kalman
+from ai.state_read_qr_code import state_read_qr_code
+from ai.state_celebrate import state_celebrate
+from calc.kalman import create_default_kalman
+import config
+from time import sleep
 
-cap = cv2.VideoCapture(capture_device)
+cap = cv2.VideoCapture(config.capture_device)
 # cap.set(cv2.cv.CV_CAP_PROP_FPS, 10)
 
-mega = Arduino(mega_usb)
-nano = Arduino(nano_usb)
-
-# Wait for camera and usb to settle...
-sleep(5)
+mega = Arduino(config.mega_usb)
+nano = Arduino(config.nano_usb)
 
 kalman = create_default_kalman()
 
 fsm = FiniteStateMachine()
 
-fms.push_state(state_celebrate())
-fms.push_state(state_read_qr_code())
+fsm.push_state(state_celebrate(mega))
+fsm.push_state(state_read_qr_code())
 fsm.push_state(state_push_button(mega, nano))
 fsm.push_state(state_move_to_button(kalman, mega, nano, dist_to_btn=300))
 fsm.push_state(state_find_button(kalman, mega))
-fms.push_state(state_wait_until_start(mega))
+fsm.push_state(state_wait_until_start(mega))
 
 while True:
-	
-	keyboard = cv2.waitKey(1) & 0xFF
-	ret, frame = cap.read()
 
-	fsm.update(frame)
+    keyboard = cv2.waitKey(1) & 0xFF
+    ret, frame = cap.read()
 
-	cv2.imshow('frame', frame)
+    fsm.update(frame)
+
+    cv2.imshow('frame', frame)
 
     if keyboard == ord('q'):
         break
