@@ -1,13 +1,17 @@
 
 import sys, os
 sys.path.insert(0, os.path.abspath(".."))
-
 from vision.detect_qr_code import DetectQRCode
+import json
+from time import time
+import pyttsx
 
 
 def state_read_qr_code(mega):
 
     qr_detector = DetectQRCode()
+
+    engine = pyttsx.init()
 
     def inner(itr, fsm, frame):
 
@@ -17,12 +21,25 @@ def state_read_qr_code(mega):
             mega.send("lspeed", -10)
             mega.send("rspeed", -10)
 
-        data = qr_detector.detect_qr(frame)
+        data_str = qr_detector.detect_qr(frame)
 
-        if data:
+        if data_str:
             mega.send("lspeed", 0)
             mega.send("rspeed", 0)
-            print(data)
+
+            data = json.loads(data_str)
+
+            for key, value in data.iteritems():
+                value = str(value)
+                print(key + ": " + value)
+                engine.say(key + ". " + value)
+
+            engine.startLoop(False)
+            ts = time()
+            while time() - ts < 5:
+                engine.iterate()
+            engine.stop()
+
             fsm.pop_state()
 
     return inner

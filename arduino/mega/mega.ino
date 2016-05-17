@@ -24,6 +24,8 @@ void tickFR() { motorFR.tick(); }
 void tickBL() { motorBL.tick(); }
 void tickBR() { motorBR.tick(); }
 
+int sensorReadTs = millis();
+
 // Camera servo
 int servoPin = 44;
 Servo servo;
@@ -54,14 +56,19 @@ void setup() {
   pinMode(lightPin, OUTPUT);
   pinMode(dSonarTrigPin, OUTPUT);
   pinMode(dSonarEchoPin, INPUT);
+  pinMode(startPin, INPUT_PULLUP);
   servo.attach(servoPin);
   servo.write(90);
 }
 
 void loop() {
   readSerialInput();
-  readSonarSensors();
-  readButtons();
+
+  if (millis() - sensorReadTs > 100) {
+    readSonarSensors();
+    readButtons();
+    sensorReadTs = millis();
+  }
 
   motorFL.update();
   motorFR.update();
@@ -73,8 +80,6 @@ void loop() {
     lightTimer = millis();
     digitalWrite(lightPin, lightTimerOn && lightCmdOn);
   }
-
-  delay(10);
 }
 
 void readSerialInput() {
@@ -118,13 +123,13 @@ void readSonarSensors() {
   duration = pulseIn(dSonarEchoPin, HIGH);
   distance = (duration / 2) * ms2mm;
 
-  String data = "distance=";
+  String data = "dsonar=";
   data.concat(distance);
   Serial.println(data);
 }
 
 void readButtons() {
-  int button = digitalRead(startPin);
+  int button = digitalRead(startPin) == 0 ? 1 : 0;
   String data = "start=";
   data.concat(button);
   Serial.println(data);

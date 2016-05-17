@@ -16,25 +16,23 @@ class Communicator:
 
     def read(self):
         reading = self.ser.readline()
-        if reading:
+        if reading and "=" in reading:
             return self._parse_reading(reading)
         else:
+            # print("warning: " + reading)
             return None
 
     def _parse_reading(self, reading):
-        try:
-            key, value = reading.split("=")
-        except:
-            return None
-
-        try:
-            if key in ["dsonar"]:
+        key, value = reading.split("=")
+        key = key.strip()
+        value = value.strip()
+        if key in ["dsonar"]:
+            try:
                 value = float(value)
-            elif key in []:
-                value = int(value)
-        except:
-            print(value)
-            return None
-
-        return [key, value]
-
+            except:
+                print(value)
+                value = 0
+        elif key in ["start"]:
+            value = (value == "1")
+        val = [key, value]
+        return val

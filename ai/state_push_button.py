@@ -1,28 +1,23 @@
 
 from time import time
 
+
 def state_push_button(mega, nano):
 
-    ts = time()
-    has_sent_reverse = [False]
+    ts = [0]
 
     def inner(itr, fsm, frame):
 
         if itr == 0:
-            mega.send("lspeed", 20)
-            mega.send("rspeed", 20)
+            ts[0] = time()
+            mega.send("lspeed", 10)
+            mega.send("rspeed", 10)
 
-        time_diff = time() - ts
+        time_diff = time() - ts[0]
 
-        if time_diff > 3 and not has_sent_reverse[0]:
-            has_sent_reverse[0] = True
-            mega.send("lspeed", -20)
-            mega.send("rspeed", -20)
-        elif time_diff > 5:
+        if 3 < time_diff:
             mega.send("lspeed", 0)
             mega.send("rspeed", 0)
             fsm.pop_state()
-
-
 
     return inner

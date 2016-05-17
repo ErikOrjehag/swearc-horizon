@@ -25,9 +25,9 @@ kalman = create_default_kalman()
 fsm = FiniteStateMachine()
 
 fsm.push_state(state_celebrate(mega))
-fsm.push_state(state_read_qr_code())
+fsm.push_state(state_read_qr_code(mega))
 fsm.push_state(state_push_button(mega, nano))
-fsm.push_state(state_move_to_button(kalman, mega, nano, dist_to_btn=300))
+fsm.push_state(state_move_to_button(kalman, mega, nano, dist_to_btn=250))
 fsm.push_state(state_find_button(kalman, mega))
 fsm.push_state(state_wait_until_start(mega))
 
@@ -36,6 +36,8 @@ while True:
     keyboard = cv2.waitKey(1) & 0xFF
     ret, frame = cap.read()
 
+    mega.update()
+    nano.update()
     fsm.update(frame)
 
     cv2.imshow('frame', frame)

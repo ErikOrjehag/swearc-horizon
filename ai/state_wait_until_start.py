@@ -7,9 +7,11 @@ def state_wait_until_start(mega):
 
     def inner(itr, fsm, frame):
 
-        button_pressed = mega.get("button")
+        button_pressed = mega.get("start")
 
-        if button_pressed or time() - ts > 5:
+        #print(button_pressed)
+
+        if button_pressed:
             fsm.pop_state()
         else:
             print("Waiting...")

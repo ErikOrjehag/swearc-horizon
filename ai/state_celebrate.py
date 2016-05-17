@@ -10,11 +10,13 @@ def state_celebrate(mega):
 
         print("celebrate")
 
+        print(itr)
+
         if itr == 0:
             ts[0] = time()
             mega.send("light", True)
 
-        elif time() - ts > 5:
+        elif time() - ts[0] > 5:
             mega.send("light", False)
             exit(0)
 

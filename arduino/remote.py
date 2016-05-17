@@ -1,17 +1,18 @@
 
-from arduino import Arduino
-from time import sleep
-from random import random
+import sys, os
+sys.path.insert(0, os.path.abspath(".."))
+from arduino.arduino import Arduino
 import cv2
 import numpy as np
+import config
 
 
 def main():
 
     lightIsOn = False
 
-    mega = Arduino("/dev/ttyUSB0")
-    nano = Arduino("/dev/ttyUSB1")
+    mega = Arduino(config.mega_usb)
+    nano = Arduino(config.nano_usb)
 
     cv2.imshow("asd", np.zeros((200, 200, 3), dtype=np.uint8))
     
