@@ -42,7 +42,9 @@ class ButtonDetector():
 
         # Find an ellipse that matches the contour that is most
         # probable to be the button on the ticket machine.
-        ellipse = self.best_ellipse_in_contours(contours)
+        # ellipse = self.best_ellipse_in_contours(contours)
+        height, width = image.shape[:2]
+        ellipse = self.best_ellipse_in_contours2(contours, width, height)
 
         # Using -1 means that we want to draw all contours.
         cv2.drawContours(res, contours, -1, (255, 255, 255), 1)
@@ -133,6 +135,43 @@ class ButtonDetector():
                             best_ellipse = ellipse
 
         return best_ellipse
+
+
+    def best_ellipse_in_contours2(self, contours, width, height):
+
+        best_ratio = None
+        best_ellipse = None
+
+        for i in range(0, len(contours)):
+
+            # The function cv2.fitEllipse() requires at least 5 points.
+            if len(contours[i]) >= 5:
+                ellipse = cv2.fitEllipse(contours[i])
+                ellipse_mask = np.zeros((height, width, 1), np.uint8)
+                cv2.ellipse(ellipse_mask, ellipse, (255), -1)
+
+                contour_mask = np.zeros((height, width, 1), np.uint8)
+                cv2.drawContours(contour_mask, contours, i, (255), -1)
+
+                and_mask = cv2.bitwise_and(ellipse_mask, contour_mask)
+
+                and_mask_white = cv2.countNonZero(and_mask)
+                ellipse_mask_white = cv2.countNonZero(ellipse_mask)
+                ratio = float(and_mask_white) / float(ellipse_mask_white)
+
+                # Debug info
+                # cv2.imshow("ellipse_mask", ellipse_mask)
+                # cv2.imshow("contour_mask", contour_mask)
+                # cv2.imshow("and_mask", and_mask)
+                # print(and_mask_white, ellipse_mask_white, ratio)
+
+                if ratio > 0.95:
+                    if (best_ratio is None) or ratio > best_ratio:
+                        best_ratio = ratio
+                        best_ellipse = ellipse
+
+        return best_ellipse
+
 
     def find_circles(self, cnt1, res):
         acc = 3
