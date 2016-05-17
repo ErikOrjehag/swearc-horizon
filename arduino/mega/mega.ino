@@ -24,10 +24,11 @@ void tickFR() { motorFR.tick(); }
 void tickBL() { motorBL.tick(); }
 void tickBR() { motorBR.tick(); }
 
-int sensorReadTs = millis();
+int readSensorsTs = millis();
 
 // Camera servo
 int servoPin = 44;
+int servoDeg = 90;
 Servo servo;
 
 // Start button
@@ -54,20 +55,31 @@ const float ms2mm = (speedOfSound / 1000.0);
 void setup() {
   Serial.begin(9600);
   pinMode(lightPin, OUTPUT);
+
   pinMode(dSonarTrigPin, OUTPUT);
   pinMode(dSonarEchoPin, INPUT);
+  pinMode(lSonarTrigPin, OUTPUT);
+  pinMode(lSonarEchoPin, INPUT);
+  pinMode(rSonarTrigPin, OUTPUT);
+  pinMode(rSonarEchoPin, INPUT);
+  pinMode(fSonarTrigPin, OUTPUT);
+  pinMode(fSonarEchoPin, INPUT);
+
   pinMode(startPin, INPUT_PULLUP);
   servo.attach(servoPin);
-  servo.write(90);
+  servo.write(servoDeg);
 }
 
 void loop() {
   readSerialInput();
 
-  if (millis() - sensorReadTs > 100) {
-    readSonarSensors();
+  if (millis() - readSensorsTs > 100) {
+    readSonar("dsonar", dSonarTrigPin, dSonarEchoPin);
+    readSonar("lsonar", lSonarTrigPin, lSonarEchoPin);
+    readSonar("rsonar", rSonarTrigPin, rSonarEchoPin);
+    //readSonar("fsonar", fSonarTrigPin, fSonarEchoPin);
     readButtons();
-    sensorReadTs = millis();
+    readSensorsTs = millis();
   }
 
   motorFL.update();
@@ -104,26 +116,33 @@ void readSerialInput() {
     } else if (command == "light") {
       lightCmdOn = (value == "True");
 
+    } else if (command = "servo") {
+      servoDeg = value.toInt();
+      servo.write(servoDeg);
+
     } else {
       Serial.println("Unrecognized command!");
     }
   }
 }
 
-void readSonarSensors() {
+void readSonar(String id, int trigPin, int echoPin) {
   long duration, distance;
+  String data;
+
   // Ensure clean HIGH pulse by first giving a short LOW
-  digitalWrite(dSonarTrigPin, LOW);
+  digitalWrite(trigPin, LOW);
   delayMicroseconds(5);
 
-  digitalWrite(dSonarTrigPin, HIGH);
+  digitalWrite(trigPin, HIGH);
   delayMicroseconds(25);
-  digitalWrite(dSonarTrigPin, LOW);
+  digitalWrite(trigPin, LOW);
 
-  duration = pulseIn(dSonarEchoPin, HIGH);
+  duration = pulseIn(echoPin, HIGH);
+
   distance = (duration / 2) * ms2mm;
-
-  String data = "dsonar=";
+  data = id;
+  data.concat("=");
   data.concat(distance);
   Serial.println(data);
 }

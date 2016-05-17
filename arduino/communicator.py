@@ -23,16 +23,20 @@ class Communicator:
             return None
 
     def _parse_reading(self, reading):
-        key, value = reading.split("=")
-        key = key.strip()
-        value = value.strip()
-        if key in ["dsonar"]:
-            try:
-                value = float(value)
-            except:
-                print(value)
-                value = 0
-        elif key in ["start"]:
-            value = (value == "1")
-        val = [key, value]
+        val = None
+        arr = reading.split("=")
+        if len(arr) == 2:
+            key = arr[0].strip()
+            value = arr[1].strip()
+            if key in ["dsonar"]:
+                try:
+                    value = float(value)
+                except:
+                    print(value)
+                    return None
+            elif key in ["start"]:
+                value = (value == "1")
+
+            val = [key, value]
+
         return val

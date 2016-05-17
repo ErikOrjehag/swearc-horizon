@@ -157,7 +157,7 @@ class ButtonDetector():
 
                 and_mask_white = cv2.countNonZero(and_mask)
                 ellipse_mask_white = cv2.countNonZero(ellipse_mask)
-                ratio = float(and_mask_white) / float(ellipse_mask_white)
+                ratio = float(and_mask_white) / float(ellipse_mask_white) if ellipse_mask_white != 0 else 0
 
                 # Debug info
                 # cv2.imshow("ellipse_mask", ellipse_mask)

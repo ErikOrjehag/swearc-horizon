@@ -1,7 +1,6 @@
 import sys, os
 sys.path.insert(0, os.path.abspath(".."))
 import cv2
-import numpy as np
 from arduino.arduino import Arduino
 from ai.finite_state_machine import FiniteStateMachine
 from ai.state_find_button import state_find_button
@@ -15,10 +14,10 @@ import config
 from time import sleep
 
 cap = cv2.VideoCapture(config.capture_device)
-# cap.set(cv2.cv.CV_CAP_PROP_FPS, 10)
 
 mega = Arduino(config.mega_usb)
 nano = Arduino(config.nano_usb)
+sleep(1)
 
 kalman = create_default_kalman()
 
