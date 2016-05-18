@@ -18,6 +18,15 @@ def state_find_empty_seat(mega):
             mega.send("lspeed", 10)
             mega.send("rspeed", 10)
 
+        dist_to_ground = mega.get("dsonar")
+
+        if dist_to_ground < 200:
+            mega.send("rspeed", 7)
+            mega.send("lspeed", 5)
+        else:
+            mega.send("rspeed", -5)
+            mega.send("lspeed", 7)
+
         if not has_seen_far[0]:
             distance = mega.get("fsonar")
             if distance and distance > 400:

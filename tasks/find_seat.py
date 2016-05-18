@@ -24,9 +24,9 @@ kalman = create_default_kalman()
 
 fsm = FiniteStateMachine()
 
-#fsm.push_state(state_celebrate(mega))
+fsm.push_state(state_celebrate(mega))
 fsm.push_state(state_find_empty_seat(mega))
-#fsm.push_state(state_wait_until_start(mega))
+fsm.push_state(state_wait_until_start(mega))
 
 mega.send("servo", 0)
 

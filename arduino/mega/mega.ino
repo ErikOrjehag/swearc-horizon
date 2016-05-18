@@ -109,7 +109,7 @@ void readSerialInput() {
       motorBR.setRPM(rpm);
 
     } else if (command == "lspeed") {
-      int rpm = value.toInt();
+      int rpm = value.toInt();cd
       motorFL.setRPM(rpm);
       motorBL.setRPM(rpm);
 
