@@ -6,11 +6,11 @@ mega_usb = "/dev/ttyUSB1"
 nano_usb = "/dev/ttyUSB0"
 
 btn_hsv_range = np.array([[
-    [130, 80, 100],
+    [200, 100, 100],
     [255, 255, 255]
 ], [
-    [0, 80, 100],
-    [30, 255, 255]
+    [0, 100, 100],
+    [20, 255, 255]
 ]])
 
 seat_hsv_range = np.array([[

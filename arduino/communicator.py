@@ -28,11 +28,11 @@ class Communicator:
         if len(arr) == 2:
             key = arr[0].strip()
             value = arr[1].strip()
-            if key in ["dsonar"]:
+            if key in ["dsonar", "lsonar", "rsonar", "fsonar"]:
                 try:
                     value = float(value)
                 except:
-                    print(value)
+                    # print("warning: " + value)
                     return None
             elif key in ["start"]:
                 value = (value == "1")

@@ -8,7 +8,7 @@
 int ppr = 1340;
 
 
-// This is called forward declaration of functions.
+// This is called forward declaseration of functions.
 void tickFL();
 void tickFR();
 void tickBL();
@@ -28,7 +28,6 @@ int readSensorsTs = millis();
 
 // Camera servo
 int servoPin = 44;
-int servoDeg = 90;
 Servo servo;
 
 // Start button
@@ -67,17 +66,16 @@ void setup() {
 
   pinMode(startPin, INPUT_PULLUP);
   servo.attach(servoPin);
-  servo.write(servoDeg);
 }
 
 void loop() {
   readSerialInput();
 
   if (millis() - readSensorsTs > 100) {
-    readSonar("dsonar", dSonarTrigPin, dSonarEchoPin);
-    readSonar("lsonar", lSonarTrigPin, lSonarEchoPin);
-    readSonar("rsonar", rSonarTrigPin, rSonarEchoPin);
-    //readSonar("fsonar", fSonarTrigPin, fSonarEchoPin);
+    readSonar("dsonar", dSonarTrigPin, dSonarEchoPin, 0);
+    readSonar("lsonar", lSonarTrigPin, lSonarEchoPin, 7);
+    readSonar("rsonar", rSonarTrigPin, rSonarEchoPin, 10);
+    readSonar("fsonar", fSonarTrigPin, fSonarEchoPin, 0);
     readButtons();
     readSensorsTs = millis();
   }
@@ -109,16 +107,15 @@ void readSerialInput() {
       motorBR.setRPM(rpm);
 
     } else if (command == "lspeed") {
-      int rpm = value.toInt();cd
+      int rpm = value.toInt();
       motorFL.setRPM(rpm);
       motorBL.setRPM(rpm);
 
     } else if (command == "light") {
       lightCmdOn = (value == "True");
 
-    } else if (command = "servo") {
-      servoDeg = value.toInt();
-      servo.write(servoDeg);
+    } else if (command == "servo") {
+      servo.write(value.toInt());
 
     } else {
       Serial.println("Unrecognized command!");
@@ -126,7 +123,7 @@ void readSerialInput() {
   }
 }
 
-void readSonar(String id, int trigPin, int echoPin) {
+void readSonar(String id, int trigPin, int echoPin, int offset) {
   long duration, distance;
   String data;
 
@@ -141,10 +138,13 @@ void readSonar(String id, int trigPin, int echoPin) {
   duration = pulseIn(echoPin, HIGH);
 
   distance = (duration / 2) * ms2mm;
-  data = id;
-  data.concat("=");
-  data.concat(distance);
-  Serial.println(data);
+
+  if (distance != 0 && distance != 1) {
+    data = id;
+    data.concat("=");
+    data.concat(distance + offset);
+    Serial.println(data);
+  }
 }
 
 void readButtons() {

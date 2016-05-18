@@ -5,6 +5,7 @@ from vision.button_detector import ButtonDetector
 from time import time
 import config
 import cv2
+from time import sleep
 
 def state_move_to_button(kalman, mega, nano, dist_to_btn):
 
@@ -47,10 +48,15 @@ def state_move_to_button(kalman, mega, nano, dist_to_btn):
             if distance > dist_to_btn:
                 mega.send("lspeed", lspeed + xnorm * 20)
                 mega.send("rspeed", rspeed - xnorm * 20)
+
             else:
-                mega.send("lspeed", 0)
-                mega.send("rspeed", 0)
-                fsm.pop_state()
+                fsonar = mega.get("fsonar")
+                if fsonar < dist_to_btn:
+                    print("OK!")
+                    mega.send("lspeed", 0)
+                    mega.send("rspeed", 0)
+                    sleep(0.5)
+                    fsm.pop_state()
 
     return inner
 

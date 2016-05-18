@@ -14,8 +14,8 @@ def state_find_button(kalman, mega):
         print("find button")
 
         if itr == 0:
-            mega.send("rspeed", 10)
-            mega.send("lspeed", 10)
+            mega.send("rspeed", 20)
+            mega.send("lspeed", 20)
 
         ellipse = button_detector.find_button(frame)
 

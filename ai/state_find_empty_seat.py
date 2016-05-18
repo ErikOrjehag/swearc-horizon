@@ -2,7 +2,7 @@ import sys, os
 sys.path.insert(0, os.path.abspath(".."))
 from vision.seat_detector import SeatDetector
 import config
-from time import time
+from time import time, sleep
 
 
 def state_find_empty_seat(mega):
@@ -20,29 +20,46 @@ def state_find_empty_seat(mega):
 
         dist_to_ground = mega.get("dsonar")
 
+        """ line follow
         if dist_to_ground < 200:
             mega.send("rspeed", 7)
             mega.send("lspeed", 5)
         else:
             mega.send("rspeed", -5)
             mega.send("lspeed", 7)
+        """
 
         if not has_seen_far[0]:
             distance = mega.get("fsonar")
-            if distance and distance > 400:
+            print("has not seen far: " + str(distance))
+            if distance and distance > 700:
                 has_seen_far[0] = True
+                t = time()
+                while time() - t < 2:
+                    mega.update()
+                    sleep(0.1)
+
         elif not has_seen_near[0]:
             distance = mega.get("fsonar")
-            if distance and distance < 400:
-                has_seen_far[0] = True
+            print("has not seen near: " + str(distance))
+            if distance and 100 < distance < 400:
+                has_seen_near[0] = True
                 ts[0] = time()
-        elif has_seen_near[0] and time() - ts[0] > 2:
+                t = time()
+                while time() - t < 2:
+                    mega.update()
+                    sleep(0.1)
+
+        elif has_seen_near[0] and time() - ts[0] > 5:
+            print("look at seat")
             mega.send("lspeed", 0)
             mega.send("rspeed", 0)
-        elif has_seen_near[0] and time() - ts[0] > 3:
+            sleep(2)
             occupied = detector.seat_occupied(frame)
             fsm.pop_state()
             if occupied:
                 fsm.push_state(state_find_empty_seat(mega))
+        else:
+            print("chillin")
 
     return inner

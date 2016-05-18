@@ -3,11 +3,7 @@ sys.path.insert(0, os.path.abspath(".."))
 import cv2
 from arduino.arduino import Arduino
 from ai.finite_state_machine import FiniteStateMachine
-from ai.state_find_button import state_find_button
 from ai.state_wait_until_start import state_wait_until_start
-from ai.state_move_to_button import state_move_to_button
-from ai.state_push_button import state_push_button
-from ai.state_read_qr_code import state_read_qr_code
 from ai.state_celebrate import state_celebrate
 from ai.state_find_empty_seat import state_find_empty_seat
 from calc.kalman import create_default_kalman
