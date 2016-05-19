@@ -9,7 +9,7 @@ class Communicator:
 
         :param port: for example "/dev/cu.usbmodem1421"
         """
-        self.ser = serial.Serial(port, 9600, timeout=0)
+        self.ser = serial.Serial(port, 4800, timeout=0)
 
     def write(self, key, value):
         self.ser.write(key + "=" + str(value) + ",")

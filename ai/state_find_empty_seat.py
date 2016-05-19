@@ -15,18 +15,20 @@ def state_find_empty_seat(mega):
     def inner(itr, fsm, frame):
 
         if itr == 0:
-            mega.send("lspeed", 10)
+            mega.send("lspeed", 11)
             mega.send("rspeed", 10)
 
         dist_to_ground = mega.get("dsonar")
 
-        """ line follow
-        if dist_to_ground < 200:
-            mega.send("rspeed", 7)
-            mega.send("lspeed", 5)
+        print(dist_to_ground)
+
+        # line follow
+        """if dist_to_ground < 200:
+            mega.send("rspeed", 10)
+            mega.send("lspeed", int(10 * 0.8))
         else:
-            mega.send("rspeed", -5)
-            mega.send("lspeed", 7)
+            mega.send("rspeed", int(10 * 0.7))
+            mega.send("lspeed", 10)
         """
 
         if not has_seen_far[0]:

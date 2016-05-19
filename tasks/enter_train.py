@@ -20,7 +20,7 @@ mega = Arduino(config.mega_usb)
 nano = Arduino(config.nano_usb)
 sleep(1)
 
-mega.send("servo", 90)
+mega.send("servo", 80)
 
 kalman = create_default_kalman()
 kalman2 = create_default_kalman()

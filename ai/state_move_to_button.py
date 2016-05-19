@@ -51,7 +51,8 @@ def state_move_to_button(kalman, mega, nano, dist_to_btn):
 
             else:
                 fsonar = mega.get("fsonar")
-                if fsonar < dist_to_btn:
+                print("check sonar: " + str(fsonar))
+                if fsonar < dist_to_btn * 2:
                     print("OK!")
                     mega.send("lspeed", 0)
                     mega.send("rspeed", 0)

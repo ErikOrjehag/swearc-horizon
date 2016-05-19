@@ -15,7 +15,9 @@ def main():
     nano = Arduino(config.nano_usb)
 
     cv2.imshow("asd", np.zeros((200, 200, 3), dtype=np.uint8))
-    
+
+    deg = 90
+
     keyboard = cv2.waitKey(10) & 0xFF
 
     while keyboard != ord("q"):
@@ -41,11 +43,21 @@ def main():
             print(lightIsOn)
             mega.send("light", lightIsOn)
         elif keyboard == ord("t"):
-            nano.send("elev", 70)
+            nano.send("elev", 100)
         elif keyboard == ord("y"):
-            nano.send("elev", -70)
+            nano.send("elev", -100)
         elif keyboard == ord("u"):
             nano.send("elev", 0)
+        elif keyboard == ord("k"):
+            deg = min(deg + 30, 180)
+            mega.send("servo", deg)
+        elif keyboard == ord("l"):
+            deg = max(deg - 30, 0)
+            mega.send("servo", deg)
+        elif keyboard == ord("j"):
+            deg = 90
+            mega.send("servo", deg)
+
 
 if __name__ == "__main__":
     main()

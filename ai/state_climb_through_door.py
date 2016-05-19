@@ -26,7 +26,7 @@ def state_climb_trough_door(mega, nano):
 
         mega.send("lspeed", -speed / 2)
         mega.send("rspeed", -speed / 2)
-        sleep(0.5)
+        sleep(0.2)
         mega.send("lspeed", 0)
         mega.send("rspeed", 0)
 
@@ -41,7 +41,7 @@ def state_climb_trough_door(mega, nano):
         nano.send("elev", elev_pwm)
         sleep(1)
         nano.send("elev", -elev_pwm)
-        sleep(2)
+        sleep(3)
         mega.send("lspeed", 0)
         mega.send("rspeed", 0)
         sleep(8)

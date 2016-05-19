@@ -15,7 +15,7 @@ int pwm = 0;
 Servo servo;
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(20000);
 
   servo.attach(servoPin);
   pinMode(optiPin, INPUT);
@@ -24,12 +24,12 @@ void setup() {
   pinMode(pwmPin2, OUTPUT);
   pinMode(resetLiftPin, INPUT_PULLUP);
   pinMode(resetElevPin, INPUT_PULLUP);
-  
+
   servo.write(servoElev);
   attachInterrupt(digitalPinToInterrupt(optiPin), optiInterrupt, RISING);
   //attachInterrupt(digitalPinToInterrupt(hallPin), hallInterrupt, RISING);
 
-  
+
 }
 
 int opticount = 0;
@@ -43,7 +43,7 @@ void loop() {
   Serial.println(digitalRead(hallPin));*/
 
   readSerialInput();
-  
+
   if (pwm >= 0) {
     analogWrite(pwmPin1, pwm);
     analogWrite(pwmPin2, 0);
@@ -63,20 +63,19 @@ void hallInterrupt() {
 
 
 void readSerialInput() {
-  if (Serial.available() > 0) {  
+  if (Serial.available() > 0) {
     String command = Serial.readStringUntil('=');
     String value = Serial.readStringUntil(',');
 
     /*Serial.print(command);
     Serial.print(" ");
     Serial.println(value);*/
-    
+
     if (command == "elev") {
       pwm = value.toInt();
-      
+
     } else {
       Serial.println("Unrecognized command!");
     }
   }
 }
-
