@@ -47,7 +47,9 @@ def state_move_to_bag(mega, kalman, destination, bag_distance):
             cv2.circle(frame, tuple(pos), 10, (255, 255, 0), -1)
             pos[0] -= frame.shape[1] / 2
 
-            height = symbol.location[0][1] - symbol.location[3][1]
+
+            height = max(symbol.location[0][1], symbol.location[1][1], symbol.location[2][1], symbol.location[3][1])\
+                     - min(symbol.location[0][1], symbol.location[1][1], symbol.location[2][1], symbol.location[3][1])
 
             correct = cv2.cv.CreateMat(2, 1, cv2.cv.CV_32FC1)
             correct[0, 0] = pos[0]
@@ -74,8 +76,12 @@ def state_move_to_bag(mega, kalman, destination, bag_distance):
             sent_speed_ts[0] = time()
 
             if distance > bag_distance or time() - start_ts[0] < min_time:
-                mega.send("lspeed", lspeed + xnorm * 10)
-                mega.send("rspeed", rspeed - xnorm * 10)
+                if x == 0:
+                    mega.send("lspeed", 10)
+                    mega.send("rspeed", 11)
+                else:
+                    mega.send("lspeed", lspeed + xnorm * 10)
+                    mega.send("rspeed", rspeed - xnorm * 10)
             else:
                 mega.send("lspeed", 0)
                 mega.send("rspeed", 0)

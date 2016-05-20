@@ -16,7 +16,7 @@ def state_move_to_sign(mega, kalman, template, sign_distance):
 
     sent_speed_ts = [time()]
     minspeed = 8
-    min_time = 5
+    min_time = 8
     start_ts = [None]
 
     def inner(itr, fsm, frame):

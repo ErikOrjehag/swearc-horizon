@@ -15,7 +15,7 @@ def state_push_button(mega, nano):
 
         time_diff = time() - ts[0]
 
-        if 4 < time_diff:
+        if 5 < time_diff:
             mega.send("lspeed", 0)
             mega.send("rspeed", 0)
             fsm.pop_state()

@@ -22,13 +22,13 @@ def state_read_qr_code(mega):
             mega.send("lspeed", -10)
             mega.send("rspeed", -10)
 
-        data_str = qr_detector.detect_qr(frame).data
+        qr = qr_detector.detect_qr(frame)
 
-        if data_str:
+        if qr:
             mega.send("lspeed", 0)
             mega.send("rspeed", 0)
 
-            data = json.loads(data_str)
+            data = json.loads(qr.data)
 
             for key, value in data.iteritems():
                 value = str(value)
