@@ -18,8 +18,9 @@ cap = cv2.VideoCapture(config.capture_device)
 
 mega = Arduino(config.mega_usb)
 nano = Arduino(config.nano_usb)
+sleep(2)
+mega.send("servo", 180)
 sleep(1)
-
 mega.send("servo", 80)
 
 kalman = create_default_kalman()
@@ -30,11 +31,11 @@ fsm = FiniteStateMachine()
 fsm.push_state(state_celebrate(mega))
 fsm.push_state(state_read_qr_code(mega))
 fsm.push_state(state_push_button(mega, nano))
-fsm.push_state(state_move_to_button(kalman2, mega, nano, dist_to_btn=300))
+# fsm.push_state(state_move_to_button(kalman2, mega, nano, dist_to_btn=300))
 # fsm.push_state(state_find_button(kalman2, mega))
 # fsm.push_state(state_straighten_up(mega, reverse=10))
-# fsm.push_state(state_move_to_button(kalman, mega, nano, dist_to_btn=350))
-fsm.push_state(state_find_button(kalman, mega))
+fsm.push_state(state_move_to_button(kalman, mega, nano, dist_to_btn=350))
+# fsm.push_state(state_find_button(kalman, mega))
 fsm.push_state(state_wait_until_start(mega))
 
 while True:

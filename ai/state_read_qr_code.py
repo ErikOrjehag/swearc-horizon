@@ -12,6 +12,7 @@ def state_read_qr_code(mega):
     qr_detector = DetectQRCode()
 
     engine = pyttsx.init()
+    engine.setProperty("rate", 90)
 
     def inner(itr, fsm, frame):
 
@@ -21,7 +22,7 @@ def state_read_qr_code(mega):
             mega.send("lspeed", -10)
             mega.send("rspeed", -10)
 
-        data_str = qr_detector.detect_qr(frame)
+        data_str = qr_detector.detect_qr(frame).data
 
         if data_str:
             mega.send("lspeed", 0)
@@ -36,10 +37,11 @@ def state_read_qr_code(mega):
 
             engine.startLoop(False)
             ts = time()
-            while time() - ts < 5:
+            while time() - ts < 10:
                 engine.iterate()
             engine.stop()
 
             fsm.pop_state()
 
     return inner
+

@@ -17,6 +17,7 @@ def main():
     cv2.imshow("asd", np.zeros((200, 200, 3), dtype=np.uint8))
 
     deg = 90
+    elev_speed = 255
 
     keyboard = cv2.waitKey(10) & 0xFF
 
@@ -43,9 +44,9 @@ def main():
             print(lightIsOn)
             mega.send("light", lightIsOn)
         elif keyboard == ord("t"):
-            nano.send("elev", 100)
+            nano.send("elev", elev_speed)
         elif keyboard == ord("y"):
-            nano.send("elev", -100)
+            nano.send("elev", -elev_speed)
         elif keyboard == ord("u"):
             nano.send("elev", 0)
         elif keyboard == ord("k"):

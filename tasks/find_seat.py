@@ -14,7 +14,10 @@ cap = cv2.VideoCapture(config.capture_device)
 
 mega = Arduino(config.mega_usb)
 nano = Arduino(config.nano_usb)
+sleep(2)
+mega.send("servo", 180)
 sleep(1)
+mega.send("servo", 0)
 
 kalman = create_default_kalman()
 
@@ -23,8 +26,6 @@ fsm = FiniteStateMachine()
 fsm.push_state(state_celebrate(mega))
 fsm.push_state(state_find_empty_seat(mega))
 fsm.push_state(state_wait_until_start(mega))
-
-mega.send("servo", 0)
 
 while True:
 

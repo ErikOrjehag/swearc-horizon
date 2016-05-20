@@ -7,15 +7,21 @@ import config
 import cv2
 from time import sleep
 
+
 def state_move_to_button(kalman, mega, nano, dist_to_btn):
 
     distance_calculator = DistanceCalculator(distance_mm=250., size_px=207.)
     button_detector = ButtonDetector(config.btn_hsv_range)
 
+    start_ts = [None]
     sent_speed_ts = [time()]
     minspeed = 8
+    min_time = 5
 
     def inner(itr, fsm, frame):
+
+        if itr == 0:
+            start_ts[0] = time()
 
         ellipse = button_detector.find_button(frame)
 
@@ -33,21 +39,21 @@ def state_move_to_button(kalman, mega, nano, dist_to_btn):
         x = prediction[0, 0]
         height = prediction[1, 0]
 
-        distance = distance_calculator.convert(height) if height else 500
+        distance = distance_calculator.convert(height) if height else 1000
 
         cv2.line(frame, (frame.shape[1] / 2, frame.shape[0] / 2), (int((frame.shape[1] / 2) + x), frame.shape[0] / 2), (255, 0, 0), 3)
 
         distnorm = min(1, max(-1, (distance - 120) / 500))
         xnorm = min(1, max(-1, x / (frame.shape[1] / 2)))
 
-        rspeed = lspeed = max(distnorm * 20, minspeed)
+        rspeed = lspeed = max(distnorm * 10, minspeed)
 
         if time() - sent_speed_ts[0] > 0.1:
             sent_speed_ts[0] = time()
 
-            if distance > dist_to_btn:
-                mega.send("lspeed", lspeed + xnorm * 20)
-                mega.send("rspeed", rspeed - xnorm * 20)
+            if distance > dist_to_btn or time() - start_ts[0] < min_time:
+                mega.send("lspeed", lspeed + xnorm * 10)
+                mega.send("rspeed", rspeed - xnorm * 10)
 
             else:
                 fsonar = mega.get("fsonar")

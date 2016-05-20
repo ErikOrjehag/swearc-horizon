@@ -17,8 +17,9 @@ cap = cv2.VideoCapture(config.capture_device)
 
 mega = Arduino(config.mega_usb)
 nano = Arduino(config.nano_usb)
+sleep(2)
+mega.send("servo", 180)
 sleep(1)
-
 mega.send("servo", 80)
 
 kalman = create_default_kalman()

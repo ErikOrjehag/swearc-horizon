@@ -24,7 +24,7 @@ class DetectQRCode(object):
         scanner.scan(image)
 
         for symbol in image:
-            if symbol.data == "None":
+            if symbol is None or symbol.data == "None":
                 return None
             else:
-                return symbol.data
+                return symbol
