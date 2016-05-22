@@ -8,8 +8,8 @@ def state_lift_bag(mega, nano):
         speed = 10
         elev_pwm = 255
 
-        forward_time = 5
-        lift_time = 9 * 12
+        forward_time = 8
+        lift_time = 9 * 5
         back_time = forward_time + 2
 
         sleep(1)

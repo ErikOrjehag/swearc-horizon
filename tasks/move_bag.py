@@ -14,6 +14,7 @@ from ai.state_lift_bag import state_lift_bag
 from ai.state_find_destination import state_find_destination
 from ai.state_move_to_human import state_move_to_human
 from ai.state_greet_human import state_greet_human
+from ai.state_find_destination2 import state_find_destination2
 from calc.kalman import create_default_kalman
 import config
 from time import sleep
@@ -28,8 +29,8 @@ mega.send("servo", 180)
 sleep(1)
 mega.send("servo", 80)
 
-# destination = [None]
-destination = ["W"]
+destination = [None]
+#destination = ["W"]
 
 kalman = create_default_kalman()
 kalman2 = create_default_kalman()
@@ -38,10 +39,10 @@ fsm = FiniteStateMachine()
 
 fsm.push_state(state_celebrate(mega))
 fsm.push_state(state_drop_bag(mega, nano))
-fsm.push_state(state_find_destination(mega, kalman, destination))
+fsm.push_state(state_find_destination2(mega, kalman, destination))
 fsm.push_state(state_lift_bag(mega, nano))
 fsm.push_state(state_announce_destination(destination))
-fsm.push_state(state_move_to_bag(mega, kalman, destination, bag_distance=450))
+fsm.push_state(state_move_to_bag(mega, kalman, destination, bag_distance=500))
 fsm.push_state(state_move_to_human(mega, kalman2))
 fsm.push_state(state_wait_until_start(mega))
 

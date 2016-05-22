@@ -27,14 +27,14 @@ void setup() {
   pinMode(m2SensorPin, INPUT);
   pinMode(m3SensorPin, INPUT);
   pinMode(m4SensorPin, INPUT);
-  attachInterrupt(digitalPinToInterrupt(m1SensorPin), interrupt1, RISING);
-  attachInterrupt(digitalPinToInterrupt(m2SensorPin), interrupt2, RISING);
-  attachInterrupt(digitalPinToInterrupt(m3SensorPin), interrupt3, RISING);
-  attachInterrupt(digitalPinToInterrupt(m4SensorPin), interrupt4, RISING);
-  analogWrite(m1PwmPin, 255);
-  analogWrite(m2PwmPin, 255);
-  analogWrite(m3PwmPin, 255);
-  analogWrite(m4PwmPin, 255);
+  //attachInterrupt(digitalPinToInterrupt(m1SensorPin), interrupt1, RISING);
+  //attachInterrupt(digitalPinToInterrupt(m2SensorPin), interrupt2, RISING);
+  //attachInterrupt(digitalPinToInterrupt(m3SensorPin), interrupt3, RISING);
+  //attachInterrupt(digitalPinToInterrupt(m4SensorPin), interrupt4, RISING);
+  //analogWrite(m1PwmPin, 255);
+  analogWrite(m2PwmPin, 100);
+  //analogWrite(m3PwmPin, 255);
+  //analogWrite(m4PwmPin, 255);
 }
 
 void interrupt1() {
@@ -44,9 +44,11 @@ void interrupt1() {
 }
 
 void interrupt2() {
-  if (n2++ > pulses) {
-    analogWrite(m2PwmPin, 0);
-  }
+  n2++;
+  Serial.println(n2);
+  //if (n2 > pulses) {
+  //  analogWrite(m2PwmPin, 0);
+  //}
 }
 
 void interrupt3() {

@@ -6,6 +6,7 @@ from ai.finite_state_machine import FiniteStateMachine
 from ai.state_wait_until_start import state_wait_until_start
 from ai.state_celebrate import state_celebrate
 from ai.state_find_empty_seat import state_find_empty_seat
+from ai.state_find_empty_seat2 import state_find_empty_seat2
 from calc.kalman import create_default_kalman
 import config
 from time import sleep
@@ -24,7 +25,7 @@ kalman = create_default_kalman()
 fsm = FiniteStateMachine()
 
 fsm.push_state(state_celebrate(mega))
-fsm.push_state(state_find_empty_seat(mega))
+fsm.push_state(state_find_empty_seat2(mega))
 fsm.push_state(state_wait_until_start(mega))
 
 while True:
@@ -39,7 +40,6 @@ while True:
     height, width = frame.shape[:2]
     cv2.line(frame, (int(width / 2), 0), (int(width / 2), height), (255, 255, 255), 1)
     cv2.line(frame, (0, int(height / 2)), (width, int(height / 2)), (255, 255, 255), 1)
-    cv2.circle(frame, (int(width / 2), int(height / 2)), int(height * 0.2), (255, 255, 255), 1)
 
     cv2.imshow('frame', frame)
 

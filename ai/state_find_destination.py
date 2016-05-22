@@ -22,7 +22,7 @@ def state_find_destination(mega, kalman, destination):
         print("find destination")
         turn_90_time = 8.5
         speed = 15
-        sign_distance = 350
+        sign_distance = 1500
 
         if itr == 0:
             ts[0] = time()

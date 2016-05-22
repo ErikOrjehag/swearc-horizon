@@ -11,12 +11,12 @@ from vision.sign_detector import SignDetector
 
 def state_move_to_sign(mega, kalman, template, sign_distance):
 
-    distance_calculator = DistanceCalculator(distance_mm=400., size_px=75.)
+    distance_calculator = DistanceCalculator(distance_mm=2000., size_px=75.)
     sign_detector = SignDetector(template)
 
     sent_speed_ts = [time()]
     minspeed = 8
-    min_time = 8
+    min_time = 5
     start_ts = [None]
 
     def inner(itr, fsm, frame):

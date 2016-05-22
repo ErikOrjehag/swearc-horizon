@@ -8,7 +8,7 @@ import cv2
 from time import sleep
 
 
-def state_move_to_button(kalman, mega, nano, dist_to_btn):
+def state_move_to_button2(kalman, mega, nano, dist_to_btn):
 
     distance_calculator = DistanceCalculator(distance_mm=250., size_px=207.)
     button_detector = ButtonDetector(config.btn_hsv_range)
@@ -17,6 +17,7 @@ def state_move_to_button(kalman, mega, nano, dist_to_btn):
     sent_speed_ts = [time()]
     minspeed = 8
     min_time = 5
+    x_offset = 40
 
     def inner(itr, fsm, frame):
 
@@ -30,7 +31,7 @@ def state_move_to_button(kalman, mega, nano, dist_to_btn):
             x = ellipse[0][0] - frame.shape[1] / 2
             height = ellipse[1][1]
             correct = cv2.cv.CreateMat(2, 1, cv2.cv.CV_32FC1)
-            correct[0, 0] = x
+            correct[0, 0] = x + x_offset
             correct[1, 0] = height
             cv2.cv.KalmanCorrect(kalman, correct)
 
@@ -48,24 +49,31 @@ def state_move_to_button(kalman, mega, nano, dist_to_btn):
 
         rspeed = lspeed = max(distnorm * 10, minspeed)
 
+        #print(dist_to_btn / distance)
+
+        camera_angle = 90
+
+        if 0 < distance < dist_to_btn * 2 and ellipse:
+            camera_angle += max(1,  dist_to_btn / distance) * 35
+
+        #print(camera_angle)
+
         print(distance)
 
         if time() - sent_speed_ts[0] > 0.1:
             sent_speed_ts[0] = time()
 
             if distance > dist_to_btn or time() - start_ts[0] < min_time:
+                mega.send("servo", camera_angle)
                 mega.send("lspeed", lspeed + xnorm * 10)
                 mega.send("rspeed", rspeed - xnorm * 10)
-
             else:
-                fsonar = mega.get("fsonar")
-                print("check sonar: " + str(fsonar))
-                if fsonar < dist_to_btn * 2:
-                    print("OK!")
-                    mega.send("lspeed", 0)
-                    mega.send("rspeed", 0)
-                    sleep(0.5)
-                    fsm.pop_state()
+                print("OK!")
+                mega.send("lspeed", 0)
+                mega.send("rspeed", 0)
+                mega.send("servo", 90)
+                sleep(0.5)
+                fsm.pop_state()
 
     return inner
 

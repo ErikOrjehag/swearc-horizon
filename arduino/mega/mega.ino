@@ -16,7 +16,7 @@ void tickBR();
 
 HalMotor motorFL(6, 7, 18, ppr, tickFL);
 HalMotor motorFR(5, 4, 2, ppr, tickFR);
-HalMotor motorBL(8, 9, 20, ppr, tickBL);
+HalMotor motorBL(8, 9, 20, 200, tickBL);
 HalMotor motorBR(11, 10, 21, ppr, tickBR);
 
 void tickFL() { motorFL.tick(); }
@@ -71,9 +71,9 @@ void setup() {
 void loop() {
   readSerialInput();
 
-  if (millis() - readSensorsTs > 100) {
+  if (millis() - readSensorsTs > 500) {
     readSonar("dsonar", dSonarTrigPin, dSonarEchoPin, 0);
-    readSonar("lsonar", lSonarTrigPin, lSonarEchoPin, 7);
+    //readSonar("lsonar", lSonarTrigPin, lSonarEchoPin, 7);
     readSonar("rsonar", rSonarTrigPin, rSonarEchoPin, 10);
     readSonar("fsonar", fSonarTrigPin, fSonarEchoPin, 0);
     readButtons();
@@ -109,7 +109,7 @@ void readSerialInput() {
     } else if (command == "lspeed") {
       int rpm = value.toInt();
       motorFL.setRPM(rpm);
-      motorBL.setRPM(rpm);
+      motorBL.setRPM(-rpm);
 
     } else if (command == "light") {
       lightCmdOn = (value == "True");

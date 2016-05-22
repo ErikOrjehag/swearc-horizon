@@ -30,14 +30,16 @@ def state_read_qr_code(mega):
 
             data = json.loads(qr.data)
 
-            for key, value in data.iteritems():
-                value = str(value)
-                print(key + ": " + value)
-                engine.say(key + ". " + value)
+            unix = int(data["time"])
+            mins = int((unix - time()) / 60)
+            hours = int(mins // 60)
+            mins -= int(hours * 60)
+
+            engine.say("Your seat number is " + str(data["seat"]) + " and your train leaves in " + str(hours) + " hours and " + str(mins) + " minutes.")
 
             engine.startLoop(False)
             ts = time()
-            while time() - ts < 10:
+            while time() - ts < 20:
                 engine.iterate()
             engine.stop()
 

@@ -29,6 +29,9 @@ class SeatDetector():
         :return:
         """
 
+        r_height = 20
+        r_width = image.shape[1]#300
+
         # Create a mask used to find areas in the image that has
         # the same color as the seat occupant.
         color_mask = self.create_mask(image)
@@ -36,7 +39,13 @@ class SeatDetector():
         # Only look in the centre
         height, width = image.shape[:2]
         centre_mask = np.zeros((height, width, 1), np.uint8)
-        cv2.circle(centre_mask, (int(width / 2), int(height / 2)), int(height * 0.2), (255), -1)
+
+        # Cirlce mask
+        # cv2.circle(centre_mask, (int(width / 2), int(height / 2)), int(height * 0.2), (255), -1)
+        upper_left = (int(width / 2 - r_width / 2), int(height / 2 - r_height / 2))
+        lower_right = (int(width / 2 + r_width / 2), int(height / 2 + r_height / 2))
+        cv2.rectangle(centre_mask, upper_left, lower_right, (255), -1)
+        cv2.rectangle(image, upper_left, lower_right, (255, 255, 255), 1)
 
         res_mask = cv2.bitwise_and(color_mask, centre_mask)
 
@@ -45,11 +54,13 @@ class SeatDetector():
 
         non_zero_centre_mask = cv2.countNonZero(centre_mask)
         non_zero_res_mask = cv2.countNonZero(res_mask)
-        occupied = non_zero_res_mask > non_zero_centre_mask * 0.2
+        ratio = float(non_zero_res_mask) / float(non_zero_centre_mask)
+        print("ratio: " + str(ratio))
+        occupied = ratio > 0.1
 
         # For debugging only.
         cv2.imshow("debug", res)
-        #cv2.imshow("centre_mask", centre_mask)
+        cv2.imshow("centre mask on frame", image)
         #cv2.imshow("color_mask", color_mask)
 
         return occupied

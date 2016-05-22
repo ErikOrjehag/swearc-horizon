@@ -17,7 +17,8 @@ def main():
     cv2.imshow("asd", np.zeros((200, 200, 3), dtype=np.uint8))
 
     deg = 90
-    elev_speed = 255
+    elev_speed = 100
+
 
     keyboard = cv2.waitKey(10) & 0xFF
 

@@ -20,7 +20,7 @@ nano = Arduino(config.nano_usb)
 sleep(2)
 mega.send("servo", 180)
 sleep(1)
-mega.send("servo", 80)
+mega.send("servo", 79)
 
 kalman = create_default_kalman()
 kalman2 = create_default_kalman()
@@ -30,9 +30,6 @@ fsm = FiniteStateMachine()
 fsm.push_state(state_celebrate(mega))
 fsm.push_state(state_push_button(mega, nano))
 fsm.push_state(state_move_to_button(kalman2, mega, nano, dist_to_btn=300))
-# fsm.push_state(state_find_button(kalman2, mega))
-# fsm.push_state(state_straighten_up(mega, reverse=10))
-# fsm.push_state(state_move_to_button(kalman, mega, nano, dist_to_btn=400))
 fsm.push_state(state_find_button(kalman, mega))
 fsm.push_state(state_wait_until_start(mega))
 
@@ -44,6 +41,8 @@ while True:
     mega.update()
     nano.update()
     fsm.update(frame)
+
+    cv2.line(frame, (int(frame.shape[1] / 2), 0), (int(frame.shape[1] / 2), frame.shape[0]), (255, 255, 255), 1)
 
     cv2.imshow('frame', frame)
 

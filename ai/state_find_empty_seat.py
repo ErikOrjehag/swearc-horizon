@@ -12,60 +12,75 @@ def state_find_empty_seat(mega):
     has_seen_near = [False]
     ts = [None]
     sent_ts = [time()]
+    #has_seen_edge = [False]
+
+    far_distance = 400
+    near_distance = 350
+
+    near_distance_r = 200
+
+    chill_time = 3
+    edge_distance = 50
+    safety_time = 2
+    occupied_time = 4
 
     def inner(itr, fsm, frame):
 
-        #if itr == 0:
-        #    mega.send("lspeed", 11)
-        #    mega.send("rspeed", 10)
-
         dist_to_ground = mega.get("dsonar")
 
-        print(dist_to_ground)
+        #print("dist_to_ground: " + str(dist_to_ground))
+        #print("fsonar: " + str(mega.get("fsonar")))
+        print(str(mega.get("rsonar")))
+        #return
+
 
         speed = 5
 
         # line follow
         if time() - sent_ts[0] > 0.5:
             sent_ts[0] = time()
-            if dist_to_ground < 25:
-                mega.send("rspeed", speed)
-                mega.send("lspeed", int(speed * 0.6))
-            else:
-                mega.send("rspeed", int(speed * 0.6))
+            if dist_to_ground > edge_distance:
+                #has_seen_edge[0] = True
+                mega.send("rspeed", speed - 3)
                 mega.send("lspeed", speed)
+            else:
+                mega.send("rspeed", speed)
+                mega.send("lspeed", speed - 1)
 
         if not has_seen_far[0]:
             distance = mega.get("fsonar")
             print("has not seen far: " + str(distance))
-            if distance and distance > 700:
+            if distance and distance > far_distance:
                 has_seen_far[0] = True
                 t = time()
-                while time() - t < 2:
+                while time() - t < safety_time:
                     mega.update()
                     sleep(0.1)
 
         elif not has_seen_near[0]:
             distance = mega.get("fsonar")
             print("has not seen near: " + str(distance))
-            if distance and 100 < distance < 400:
+            if (distance and 100 < distance < near_distance) or (20 < mega.get("rsonar") < near_distance_r):
                 has_seen_near[0] = True
                 ts[0] = time()
                 t = time()
-                while time() - t < 2:
+                while time() - t < safety_time:
                     mega.update()
                     sleep(0.1)
 
-        elif has_seen_near[0] and time() - ts[0] > 5:
+        elif has_seen_near[0] and time() - ts[0] > chill_time:
             print("look at seat")
             mega.send("lspeed", 0)
             mega.send("rspeed", 0)
-            sleep(2)
+            sleep(1)
             occupied = detector.seat_occupied(frame)
             fsm.pop_state()
             if occupied:
                 fsm.push_state(state_find_empty_seat(mega))
+            else:
+                sleep(occupied_time)
         else:
             print("chillin")
 
     return inner
+
